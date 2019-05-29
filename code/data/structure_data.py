@@ -3,9 +3,9 @@ import csv
 import random
 import math
 
-DOT_1977_PATH = '/Users/joseivelarde/Projects/dot/data/raw/1977_Output.txt'
-OUTFILE = '/Users/joseivelarde/Projects/dot/data/clean/structured_1977.csv'
-DATA_DIR = '/Users/joseivelarde/Projects/dot/data/1977/'
+DOT_1977_PATH = '/Users/joseivelarde/Projects/dot-nlp/data/raw/1977_Output.txt'
+OUTFILE = '/Users/joseivelarde/Projects/dot-nlp/data/clean/structured_1977.csv'
+DATA_DIR = '/Users/joseivelarde/Projects/dot-nlp/data/1977/'
 
 class TitleParser:
     def __init__(self):
@@ -41,6 +41,7 @@ class TitleParser:
 def load_dot():
     with open(DOT_1977_PATH,'rb') as f:
         dot = f.readlines()
+    dot = [line.decode('utf-8',errors='ignore') for line in dot]
     dot = [line.rstrip() for line in dot]
     dot = [line for line in dot if line != '']
     return dot
@@ -68,7 +69,7 @@ def make_occ_dictionary(dot):
 
 def write_set(definitions,set_type):
     outfile = DATA_DIR+set_type+'.csv'
-    with open(outfile,'wb') as csv_file:
+    with open(outfile,'w') as csv_file:
         writer = csv.writer(csv_file)
         for key, value in definitions.items():
             writer.writerow([key,value[0],value[1]])
