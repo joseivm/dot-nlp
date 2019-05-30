@@ -108,8 +108,20 @@ class DOTProcessor(DataProcessor):
 
     def get_dev_examples(self, data_dir):
         """See base class."""
-        return self._create_examples(
-            self._read_csv(os.path.join(data_dir, "dev.csv")), "dev")
+        lines = []
+        with open(data_dir+'/dev.csv','r',errors='ignore') as f:
+            reader = csv.reader(f)
+            for line in reader:
+                lines.append(line)
+        examples = []
+        set_type = 'dev'
+        for (i, line) in enumerate(lines):
+            guid = "%s-%s" % (set_type, i)
+            text_a = line[2]
+            label = int(line[0][4:7])
+            label = self.to_three_digit(label)
+            examples.append(InputExample(guid=guid, text_a=text_a, label=label))
+        return examples
 
     def get_labels(self):
         """See base class."""
