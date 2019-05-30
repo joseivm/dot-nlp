@@ -3,7 +3,7 @@ import os
 import csv
 import random
 import sys
-sys.path.append(os.path.abspath("/Users/joseivelarde/Projects/dot-nlp/code/features"))
+sys.path.append(os.path.abspath("/home/joseivm/dot-nlp/code/features"))
 import feature_builder as fb
 from pytorch_pretrained_bert.file_utils import PYTORCH_PRETRAINED_BERT_CACHE, WEIGHTS_NAME, CONFIG_NAME
 from pytorch_pretrained_bert.modeling import BertForSequenceClassification, BertConfig
@@ -104,7 +104,7 @@ def convert_examples_to_features(examples, label_list, max_seq_length,
         #     logger.info("label: %s (id = %d)" % (example.label, label_id))
 
         features.append(
-                InputFeatures(input_ids=input_ids,
+                fb.InputFeatures(input_ids=input_ids,
                               input_mask=input_mask,
                               segment_ids=segment_ids,
                               label_id=label_id))
@@ -144,7 +144,7 @@ all_label_ids = torch.tensor([f.label_id for f in train_features], dtype=torch.l
 train_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
 
 train_sampler = RandomSampler(train_data)
-train_dataloader = DataLoader(train_data, sampler=train_sampler, batch_size=32)
+train_dataloader = DataLoader(train_data, sampler=train_sampler, batch_size=8)
 optimizer = BertAdam(optimizer_grouped_parameters,
                              lr=learning_rate,
                              warmup=warmup_proportion,
@@ -153,8 +153,10 @@ optimizer = BertAdam(optimizer_grouped_parameters,
 global_step = 0
 nb_tr_steps = 0
 tr_loss = 0
+
+device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+model.to(device)
 model.train()
-device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
 for _ in trange(int(num_train_epochs), desc="Epoch"):
     tr_loss = 0
     nb_tr_examples, nb_tr_steps = 0, 0
