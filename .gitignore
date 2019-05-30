@@ -2,6 +2,8 @@
 notebooks/
 .DS_Store
 documents/transcription-1965/
-models/
+models/*.txt
+models/*.bin
+models/*.json
 data/clean
 __pycache__
