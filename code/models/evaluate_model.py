@@ -18,6 +18,7 @@ from tqdm import tqdm, trange
 
 from torch.nn import CrossEntropyLoss, MSELoss
 from scipy.stats import pearsonr, spearmanr
+from sklearn.metrics import matthews_corrcoef, f1_score
 
 def convert_examples_to_features(examples, label_list, max_seq_length,
                                  tokenizer, output_mode):
@@ -110,13 +111,16 @@ def convert_examples_to_features(examples, label_list, max_seq_length,
                               label_id=label_id))
     return features
 
+def simple_accuracy(preds, labels):
+    return (preds == labels).mean()
+
 def compute_metrics(preds, labels):
     assert len(preds) == len(labels)
     return acc_and_f1(preds,labels)
 
 def acc_and_f1(preds, labels):
     acc = simple_accuracy(preds, labels)
-    f1 = f1_score(y_true=labels, y_pred=preds)
+    f1 = f1_score(y_true=labels, y_pred=preds,average='weighted')
     return {
         "acc": acc,
         "f1": f1,
@@ -142,11 +146,10 @@ max_seq_length = 128
 learning_rate = 5e-5
 warmup_proportion = 0.1
 num_train_epochs = 3
-num_train_optimization_steps = int(len(train_examples)*num_train_epochs)
 
 eval_examples = processor.get_dev_examples(data_dir)
 eval_features = convert_examples_to_features(
-    eval_examples, label_list, max_seq_length, tokenizer, output_mode)
+    eval_examples, labels, max_seq_length, tokenizer, output_mode)
 
 
 all_input_ids = torch.tensor([f.input_ids for f in eval_features], dtype=torch.long)
@@ -184,14 +187,13 @@ for input_ids, input_mask, segment_ids, label_ids in tqdm(eval_dataloader, desc=
         preds[0] = np.append(
             preds[0], logits.detach().cpu().numpy(), axis=0)
 
-    eval_loss = eval_loss / nb_eval_steps
-    preds = preds[0]
-    preds = np.argmax(preds, axis=1)
-    result = compute_metrics(task_name, preds, all_label_ids.numpy())
-    result['eval_loss'] = eval_loss
-    result['global_step'] = global_step
-    output_eval_file = os.path.join(output_dir, "eval_results.txt")
+eval_loss = eval_loss / nb_eval_steps
+preds = preds[0]
+preds = np.argmax(preds, axis=1)
+result = compute_metrics(preds, all_label_ids.numpy())
+result['eval_loss'] = eval_loss
+output_eval_file = os.path.join(output_dir, "eval_results.txt")
 
-    with open(output_eval_file, "w") as writer:
-        for key in sorted(result.keys()):
-            writer.write("%s = %s\n" % (key, str(result[key])))
+with open(output_eval_file, "w") as writer:
+    for key in sorted(result.keys()):
+        writer.write("%s = %s\n" % (key, str(result[key])))
