@@ -138,7 +138,7 @@ cache_dir = os.path.join(str(PYTORCH_PRETRAINED_BERT_CACHE), 'distributed_{}'.fo
 
 model = BertForSequenceClassification.from_pretrained(output_dir,num_labels=num_labels)
 tokenizer = BertTokenizer.from_pretrained(output_dir, do_lower_case=True)
-device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
 output_mode = 'classification'
@@ -193,7 +193,7 @@ preds = np.argmax(preds, axis=1)
 df = pd.read_csv('/home/joseivm/dot-nlp/data/1977/dev.csv',header=None)
 df.iloc[:,2] = preds
 df.columns = ['Code','Title','Prediction']
-df[['Title','Code','Prediction']].to_csv('/home/joseivm/dot-nlp/output/preds.csv')
+df[['Title','Code','Prediction']].to_csv('/home/joseivm/dot-nlp/results/preds.csv')
 result = compute_metrics(preds, all_label_ids.numpy())
 result['eval_loss'] = eval_loss
 output_eval_file = os.path.join(output_dir, "eval_results.txt")
