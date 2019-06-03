@@ -247,6 +247,10 @@ for input_ids, input_mask, segment_ids, label_ids in tqdm(eval_dataloader, desc=
 eval_loss = eval_loss / nb_eval_steps
 preds = preds[0]
 preds = np.argmax(preds, axis=1)
+df = pd.read_csv('/home/joseivm/dot-nlp/data/1977/dev.csv',header=None)
+df.iloc[:,2] = preds
+df.columns = ['Code','Title','Prediction']
+df[['Title','Code','Prediction']].to_csv('/home/joseivm/dot-nlp/output/preds.csv')
 result = compute_metrics(preds, all_label_ids.numpy())
 result['eval_loss'] = eval_loss
 output_eval_file = os.path.join(output_dir, "eval_results.txt")
