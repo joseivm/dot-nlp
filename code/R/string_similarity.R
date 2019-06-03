@@ -17,26 +17,26 @@ load_cens_occs <- function(){
   return(cens_occs)
 }
 
-get_similar_titles <- function(occ,threshold=0.8,p=0.1){
-  sim_vector <- 1-stringdist(occ,dot_occs,method='jw',p=p)
+get_similar_titles <- function(occ,occ_list,threshold=0.8,p=0.1){
+  sim_vector <- 1-stringdist(occ,occ_list,method='jw',p=p)
   sim_titles <- sim_vector >= threshold
-  sim_titles <- dot_occs[sim_titles]
+  sim_titles <- occ_list[sim_titles]
   return(sim_titles)
 }
 
-match <- function(unmatched_occs,threshold=0.9){
+match <- function(unmatched_occs,occ_list,threshold=0.9){
   occ_matches <- data.table('Census Occupation'=character(),'DOT Match'=character())
   i <- 1
   for (occ in unmatched_occs){
     if (i %% 1000 == 0){
       print(i)
     }
-    sim_vector <- 1-stringdist(occ,dot_occs,method='jw',p=0.1)
+    sim_vector <- 1-stringdist(occ,occ_list,method='jw',p=0.1)
     sim_titles <- sim_vector >= threshold
-    if (sum(sim_titles) == 0){
+    if (is.na(sim_titles) | sum(sim_titles) == 0){
       sim_title <- NA
     }else{
-      sim_title <- dot_occs[sim_titles][1]
+      sim_title <- occ_list[sim_titles][1]
     }
     occ_matches <- rbind(occ_matches,list('Census Occupation'=occ,'DOT Match'=sim_title))
     i <- i+1
@@ -47,4 +47,5 @@ match <- function(unmatched_occs,threshold=0.9){
 dot <- load_dot()
 cens <- fread(census_file)
 unmatched_occs <- cens[!(Title %in% dot$Title),.N,by=Title]$Title
-match(unmatched_occs,0.95)
+dot_occs <- dot$Title
+match(unmatched_occs,dot_occs,0.95)
