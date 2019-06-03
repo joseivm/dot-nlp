@@ -7,3 +7,4 @@ models/*.bin
 models/*.json
 data/clean
 __pycache__
+*.ipynb
