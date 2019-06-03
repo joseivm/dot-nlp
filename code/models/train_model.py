@@ -110,6 +110,19 @@ def convert_examples_to_features(examples, label_list, max_seq_length,
                               label_id=label_id))
     return features
 
+def compute_metrics(preds, labels):
+    assert len(preds) == len(labels)
+    return acc_and_f1(preds,labels)
+
+def acc_and_f1(preds, labels):
+    acc = simple_accuracy(preds, labels)
+    return {
+        "acc": acc,
+    }
+
+def simple_accuracy(preds, labels):
+    return (preds == labels).mean()
+
 
 data_dir = "/home/joseivm/dot-nlp/data/1977"
 output_dir = "/home/joseivm/dot-nlp/models"
@@ -127,7 +140,7 @@ output_mode = 'classification'
 max_seq_length = 128
 learning_rate = 5e-5
 warmup_proportion = 0.1
-num_train_epochs = 3
+num_train_epochs = 6
 num_train_optimization_steps = int(len(train_examples)*num_train_epochs)
 
 train_features = convert_examples_to_features(train_examples, labels, max_seq_length, tokenizer, output_mode)
@@ -185,3 +198,59 @@ output_config_file = os.path.join(output_dir, CONFIG_NAME)
 torch.save(model_to_save.state_dict(), output_model_file)
 model_to_save.config.to_json_file(output_config_file)
 tokenizer.save_vocabulary(output_dir)
+
+model = BertForSequenceClassification.from_pretrained(output_dir, num_labels=num_labels)
+tokenizer = BertTokenizer.from_pretrained(output_dir, do_lower_case=True)
+
+model.to(device)
+
+eval_examples = processor.get_dev_examples(data_dir)
+eval_features = convert_examples_to_features(
+    eval_examples, labels, max_seq_length, tokenizer, output_mode)
+
+
+all_input_ids = torch.tensor([f.input_ids for f in eval_features], dtype=torch.long)
+all_input_mask = torch.tensor([f.input_mask for f in eval_features], dtype=torch.long)
+all_segment_ids = torch.tensor([f.segment_ids for f in eval_features], dtype=torch.long)
+all_label_ids = torch.tensor([f.label_id for f in eval_features], dtype=torch.long)
+
+eval_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
+# Run prediction for full data
+eval_sampler = SequentialSampler(eval_data)
+eval_dataloader = DataLoader(eval_data, sampler=eval_sampler, batch_size=8)
+
+model.eval()
+eval_loss = 0
+nb_eval_steps = 0
+preds = []
+
+for input_ids, input_mask, segment_ids, label_ids in tqdm(eval_dataloader, desc="Evaluating"):
+    input_ids = input_ids.to(device)
+    input_mask = input_mask.to(device)
+    segment_ids = segment_ids.to(device)
+    label_ids = label_ids.to(device)
+
+    with torch.no_grad():
+        logits = model(input_ids, segment_ids, input_mask, labels=None)
+
+    loss_fct = CrossEntropyLoss()
+    tmp_eval_loss = loss_fct(logits.view(-1, num_labels), label_ids.view(-1))
+
+    eval_loss += tmp_eval_loss.mean().item()
+    nb_eval_steps += 1
+    if len(preds) == 0:
+        preds.append(logits.detach().cpu().numpy())
+    else:
+        preds[0] = np.append(
+            preds[0], logits.detach().cpu().numpy(), axis=0)
+
+eval_loss = eval_loss / nb_eval_steps
+preds = preds[0]
+preds = np.argmax(preds, axis=1)
+result = compute_metrics(preds, all_label_ids.numpy())
+result['eval_loss'] = eval_loss
+output_eval_file = os.path.join(output_dir, "eval_results.txt")
+
+with open(output_eval_file, "w") as writer:
+    for key in sorted(result.keys()):
+        writer.write("%s = %s\n" % (key, str(result[key])))
