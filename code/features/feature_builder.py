@@ -112,6 +112,7 @@ class DOTProcessor(DataProcessor):
         """See base class."""
         lines = []
         code_to_idx = {'data':0,'people':1,'things':2}
+        label_idx = code_to_idx[code]
         with open(data_dir+'/dev.csv','r',errors='ignore') as f:
             reader = csv.reader(f)
             for line in reader:
@@ -129,7 +130,7 @@ class DOTProcessor(DataProcessor):
 
     def get_labels(self,code=None):
         """See base class."""
-        labels = list(range(10)) if code is not None else list(range(1000))
+        labels = [None] if code is not None else list(range(1000))
         return labels
 
     def to_three_digit(self,x):

@@ -1,16 +1,15 @@
 import pandas as pd
-import os
 import csv
 import random
 import sys
-sys.path.append(os.path.abspath("/home/joseivm/dot-nlp/code/features"))
-import feature_builder as fb
+import numpy as np
+import torch
+
 from pytorch_pretrained_bert.file_utils import PYTORCH_PRETRAINED_BERT_CACHE, WEIGHTS_NAME, CONFIG_NAME
 from pytorch_pretrained_bert.modeling import BertForSequenceClassification, BertConfig
 from pytorch_pretrained_bert.tokenization import BertTokenizer
 from pytorch_pretrained_bert.optimization import BertAdam
-import numpy as np
-import torch
+
 from torch.utils.data import (DataLoader, RandomSampler, SequentialSampler,
                               TensorDataset)
 from torch.utils.data.distributed import DistributedSampler
@@ -19,6 +18,15 @@ from tqdm import tqdm, trange
 from torch.nn import CrossEntropyLoss, MSELoss
 from scipy.stats import pearsonr, spearmanr
 from sklearn.metrics import mean_squared_error
+
+import os
+from dotenv import load_dotenv, find_dotenv
+dotenv_path = find_dotenv()
+load_dotenv(dotenv_path)
+
+PROJECT_DIR = os.environ.get("PROJECT_DIR")
+sys.path.append(os.path.join(PROJECT_DIR,"code/features"))
+import feature_builder as fb
 
 def convert_examples_to_features(examples, label_list, max_seq_length,
                                  tokenizer, output_mode):
@@ -124,11 +132,11 @@ def simple_accuracy(preds, labels):
     return (preds == labels).mean()
 
 def train_model(code=None):
-    data_dir = "/home/joseivm/dot-nlp/data/1977"
-    output_dir = "/home/joseivm/dot-nlp/models"
-    results_dir = "/home/joseivm/dot-nlp/results"
+    data_dir = os.path.join(PROJECT_DIR,"data/1977")
+    output_dir = os.path.join(PROJECT_DIR,"models")
+    results_dir = os.path.join(PROJECT_DIR,"results")
     bert_model = 'bert-large-uncased'
-    output_mode = 'classification'
+    output_mode = 'regression'
     max_seq_length = 128
     learning_rate = 5e-5
     warmup_proportion = 0.1
@@ -146,7 +154,7 @@ def train_model(code=None):
 
     num_train_optimization_steps = int(len(train_examples)*num_train_epochs)
 
-    train_features = fb.convert_examples_to_features(train_examples, labels, max_seq_length, tokenizer, output_mode)
+    train_features = processor.convert_examples_to_features(train_examples, labels, max_seq_length, tokenizer, output_mode)
     param_optimizer = list(model.named_parameters())
     no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
     optimizer_grouped_parameters = [
@@ -156,7 +164,10 @@ def train_model(code=None):
     all_input_ids = torch.tensor([f.input_ids for f in train_features], dtype=torch.long)
     all_input_mask = torch.tensor([f.input_mask for f in train_features], dtype=torch.long)
     all_segment_ids = torch.tensor([f.segment_ids for f in train_features], dtype=torch.long)
-    all_label_ids = torch.tensor([f.label_id for f in train_features], dtype=torch.long)
+    if output_mode == "classification":
+        all_label_ids = torch.tensor([f.label_id for f in train_features], dtype=torch.long)
+    elif output_mode == "regression":
+        all_label_ids = torch.tensor([f.label_id for f in train_features], dtype=torch.float)
     train_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
 
     train_sampler = RandomSampler(train_data)
@@ -268,8 +279,6 @@ def train_model(code=None):
         preds = np.rint(preds)
     df = pd.Series(preds)
     df.to_csv(os.path.join(results_dir,'preds.csv'),index=False)
-    df.columns = ['Code','Title','Prediction']
-    df[['Title','Code','Prediction']].to_csv('/home/joseivm/dot-nlp/output/preds.csv')
     result = compute_metrics(preds, all_label_ids.numpy())
     result['eval_loss'] = eval_loss
     output_eval_file = os.path.join(output_dir, "eval_results.txt")
@@ -279,7 +288,9 @@ def train_model(code=None):
             writer.write("%s = %s\n" % (key, str(result[key])))
 
 def stitch_predictions():
-    df = pd.read_csv('/home/joseivm/dot-nlp/data/1977/dev.csv',header=None)
+    results_dir = os.path.join(PROJECT_DIR,"results")
+    data_dir = os.path.join(PROJECT_DIR,"data/1977")
+    df = pd.read_csv(data_dir+'/dev.csv',header=None)
     df.columns = ['Code','Title','Description']
     codes = ['data','people','things']
     for code in codes:
@@ -288,9 +299,12 @@ def stitch_predictions():
         df.loc[:,code] = code_preds
 
     df.drop(columns='Description',inplace=True)
-    df['DPT'] = df['data'].map(str)+df['people'].map(str)+df['things'].map(str)
-    df.to_csv('/home/joseivm/dot-nlp/results/separate_regression/preds.csv')
+    df['DPT'] = df['data'].map('{0:g}'.format)+df['people'].map('{0:g}'.format)+df['things'].map('{0:g}'.format)
+    labels = df['Code'].str.slice(start=4,stop=7)
+    print((labels == df['DPT'].map(str)).mean())
+    df[['Title','Code','DPT']].to_csv(results_dir+'/separate/preds.csv')
 
-train_model('data')
+# train_model('data')
 # train_model('people')
 # train_model('things')
+stitch_predictions()
