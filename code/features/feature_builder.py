@@ -88,10 +88,10 @@ class DataProcessor(object):
 class DOTProcessor(DataProcessor):
     """Processor for the 1977 DOT data set"""
 
-    def get_train_examples(self, data_dir,code=None):
+    def get_train_examples(self, data_dir,code=''):
         """See base class."""
         lines = []
-        code_to_idx = {'data':0,'people':1,'things':2}
+        code_to_idx = {'data':0,'people':1,'things':2,'':None}
         label_idx = code_to_idx[code]
         with open(data_dir+'/train.csv','r',errors='ignore') as f:
             reader = csv.reader(f)
@@ -103,15 +103,15 @@ class DOTProcessor(DataProcessor):
             guid = "%s-%s" % (set_type, i)
             text_a = line[2]
             label = line[0][4:7]
-            label = label[label_idx] if code is not None else label
+            label = label[label_idx] if code else label
             label = int(label)
             examples.append(InputExample(guid=guid, text_a=text_a, label=label))
         return examples
 
-    def get_dev_examples(self, data_dir,code=None):
+    def get_dev_examples(self, data_dir,code=''):
         """See base class."""
         lines = []
-        code_to_idx = {'data':0,'people':1,'things':2}
+        code_to_idx = {'data':0,'people':1,'things':2,'':None}
         label_idx = code_to_idx[code]
         with open(data_dir+'/dev.csv','r',errors='ignore') as f:
             reader = csv.reader(f)
@@ -123,23 +123,15 @@ class DOTProcessor(DataProcessor):
             guid = "%s-%s" % (set_type, i)
             text_a = line[2]
             label = line[0][4:7]
-            label = label[label_idx] if code is not None else label
+            label = label[label_idx] if code else label
             label = int(label)
             examples.append(InputExample(guid=guid, text_a=text_a, label=label))
         return examples
 
-    def get_labels(self,code=None):
+    def get_labels(self,code=''):
         """See base class."""
-        labels = [None] if code is not None else list(range(1000))
+        labels = [None] if code else list(range(1000))
         return labels
-
-    def to_three_digit(self,x):
-        if x >= 100:
-            return str(x)
-        elif x < 10:
-            return '00'+str(x)
-        else:
-            return '0'+str(x)
 
     def _create_examples(self, lines, set_type):
         """Creates examples for the training and dev sets."""
@@ -232,9 +224,3 @@ class DOTProcessor(DataProcessor):
                                   segment_ids=segment_ids,
                                   label_id=label_id))
         return features
-
-# processor = DOTProcessor
-# output_mode = 'classification'
-# label_list = processor.get_labels()
-# num_labels = len(label_list)
-# tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.do_lower_case)
