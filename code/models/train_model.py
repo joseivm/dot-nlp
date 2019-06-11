@@ -131,16 +131,16 @@ def acc_and_mse(preds, labels):
 def simple_accuracy(preds, labels):
     return (preds == labels).mean()
 
-def train_model(code=None):
+def train_model(code="",identifier=''):
     data_dir = os.path.join(PROJECT_DIR,"data/1977")
     output_dir = os.path.join(PROJECT_DIR,"models")
     results_dir = os.path.join(PROJECT_DIR,"results")
     bert_model = 'bert-large-uncased'
-    output_mode = 'regression'
+    output_mode = 'classification'
     max_seq_length = 128
     learning_rate = 5e-5
     warmup_proportion = 0.1
-    num_train_epochs = 6
+    num_train_epochs = 20
     output_dir = os.path.join(output_dir,code)
     results_dir = os.path.join(results_dir,code)
     processor = fb.DOTProcessor()
@@ -277,11 +277,15 @@ def train_model(code=None):
     elif output_mode == "regression":
         preds = np.squeeze(preds)
         preds = np.rint(preds)
-    df = pd.Series(preds)
-    df.to_csv(os.path.join(results_dir,'preds.csv'),index=False)
+
+    df = pd.read_csv(data_dir+'/dev.csv',header=None)
+    df.columns = ['Code','Title','Description']
+    df['DPT'] = preds
+    df = df[['Title','Code','DPT']]
+    df.to_csv(os.path.join(results_dir,identifier+'preds.csv'),index=False)
     result = compute_metrics(preds, all_label_ids.numpy())
     result['eval_loss'] = eval_loss
-    output_eval_file = os.path.join(output_dir, "eval_results.txt")
+    output_eval_file = os.path.join(output_dir,identifier+ "eval_results.txt")
 
     with open(output_eval_file, "w") as writer:
         for key in sorted(result.keys()):
@@ -304,7 +308,7 @@ def stitch_predictions():
     print((labels == df['DPT'].map(str)).mean())
     df[['Title','Code','DPT']].to_csv(results_dir+'/separate/preds.csv')
 
-# train_model('data')
+train_model(code='',identifier='20epochs')
 # train_model('people')
 # train_model('things')
-stitch_predictions()
+# stitch_predictions()
