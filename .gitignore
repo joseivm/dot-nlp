@@ -7,6 +7,7 @@ models/**/*.bin
 models/**/*.json
 
 data/clean
+data/raw
 __pycache__
 *.ipynb
 .env

@@ -4,6 +4,7 @@ import random
 import sys
 import numpy as np
 import torch
+import json
 
 from pytorch_pretrained_bert.file_utils import PYTORCH_PRETRAINED_BERT_CACHE, WEIGHTS_NAME, CONFIG_NAME
 from pytorch_pretrained_bert.modeling import BertForSequenceClassification, BertConfig
@@ -16,8 +17,6 @@ from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm, trange
 
 from torch.nn import CrossEntropyLoss, MSELoss
-from scipy.stats import pearsonr, spearmanr
-from sklearn.metrics import mean_squared_error
 
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -28,42 +27,27 @@ PROJECT_DIR = os.environ.get("PROJECT_DIR")
 sys.path.append(os.path.join(PROJECT_DIR,"code/features"))
 import feature_builder as fb
 import eval_utils as eu
+import utils
 
-def compute_metrics(preds, labels):
-    assert len(preds) == len(labels)
-    return acc_and_mse(preds,labels)
-
-def acc_and_mse(preds, labels):
-    acc = simple_accuracy(preds, labels)
-    mse = mean_squared_error(preds,labels)
-    return {"acc": acc, "mse": mse}
-
-def simple_accuracy(preds, labels):
-    return (preds == labels).mean()
-
-def train_model(code, identifier):
+def train_model(code, args):
+    identifier = args.identifier
     data_dir = os.path.join(PROJECT_DIR,"data/1977")
     model_dir = os.path.join(PROJECT_DIR,"models/separate",identifier,code)
     os.makedirs(model_dir,exist_ok=True)
     output_dir = os.path.join(PROJECT_DIR,"output/separate")
-    bert_model = 'bert-large-uncased'
-    output_mode = 'regression'
-    max_seq_length = 128
-    learning_rate = 5e-5
-    warmup_proportion = 0.1
-    num_train_epochs = 20
+
     processor = fb.DOTProcessor()
     labels = processor.get_labels(code)
     num_labels = len(labels)
-    tokenizer = BertTokenizer.from_pretrained(bert_model, do_lower_case=True)
+    tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.lower_case)
     train_examples = processor.get_train_examples(data_dir,code)
     cache_dir = os.path.join(str(PYTORCH_PRETRAINED_BERT_CACHE), 'distributed_{}'.format(-1))
-    model = BertForSequenceClassification.from_pretrained(bert_model,cache_dir=cache_dir,
+    model = BertForSequenceClassification.from_pretrained(args.bertbert_model,cache_dir=cache_dir,
                   num_labels=num_labels)
 
-    num_train_optimization_steps = int(len(train_examples)*num_train_epochs)
+    num_train_optimization_steps = int(len(train_examples)*args.num_train_epochs)
 
-    train_features = processor.convert_examples_to_features(train_examples, labels, max_seq_length, tokenizer, output_mode)
+    train_features = processor.convert_examples_to_features(train_examples, labels, args.max_seq_length, tokenizer, args.output_mode)
     param_optimizer = list(model.named_parameters())
     no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
     optimizer_grouped_parameters = [
@@ -73,17 +57,17 @@ def train_model(code, identifier):
     all_input_ids = torch.tensor([f.input_ids for f in train_features], dtype=torch.long)
     all_input_mask = torch.tensor([f.input_mask for f in train_features], dtype=torch.long)
     all_segment_ids = torch.tensor([f.segment_ids for f in train_features], dtype=torch.long)
-    if output_mode == "classification":
+    if args.output_mode == "classification":
         all_label_ids = torch.tensor([f.label_id for f in train_features], dtype=torch.long)
-    elif output_mode == "regression":
+    elif args.output_mode == "regression":
         all_label_ids = torch.tensor([f.label_id for f in train_features], dtype=torch.float)
     train_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
 
     train_sampler = RandomSampler(train_data)
-    train_dataloader = DataLoader(train_data, sampler=train_sampler, batch_size=8)
+    train_dataloader = DataLoader(train_data, sampler=train_sampler, batch_size=args.train_batch_size)
     optimizer = BertAdam(optimizer_grouped_parameters,
-                                 lr=learning_rate,
-                                 warmup=warmup_proportion,
+                                 lr=args.learning_rate,
+                                 warmup=args.warmup_proportion,
                                  t_total=num_train_optimization_steps)
 
     global_step = 0
@@ -93,7 +77,7 @@ def train_model(code, identifier):
     device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
     model.to(device)
     model.train()
-    for _ in trange(int(num_train_epochs), desc="Epoch"):
+    for _ in trange(int(args.num_train_epochs), desc="Epoch"):
         tr_loss = 0
         nb_tr_examples, nb_tr_steps = 0, 0
         for step, batch in enumerate(tqdm(train_dataloader, desc="Iteration")):
@@ -102,10 +86,10 @@ def train_model(code, identifier):
 
             # define a new function to compute loss values for both output_modes
             logits = model(input_ids, segment_ids, input_mask, labels=None)
-            if output_mode == "classification":
+            if args.output_mode == "classification":
                 loss_fct = CrossEntropyLoss()
                 loss = loss_fct(logits.view(-1, num_labels), label_ids.view(-1))
-            elif output_mode == "regression":
+            elif args.output_mode == "regression":
                 loss_fct = MSELoss()
                 loss = loss_fct(logits.view(-1), label_ids.view(-1))
 
@@ -128,27 +112,27 @@ def train_model(code, identifier):
     tokenizer.save_vocabulary(model_dir)
 
     model = BertForSequenceClassification.from_pretrained(model_dir, num_labels=num_labels)
-    tokenizer = BertTokenizer.from_pretrained(model_dir, do_lower_case=True)
+    tokenizer = BertTokenizer.from_pretrained(model_dir, do_lower_case=args.lower_case)
 
     model.to(device)
 
     eval_examples = processor.get_dev_examples(data_dir,code)
-    eval_features = convert_examples_to_features(
-        eval_examples, labels, max_seq_length, tokenizer, output_mode)
+    eval_features = processor.convert_examples_to_features(
+        eval_examples, labels, args.max_seq_length, tokenizer, output_mode)
 
 
     all_input_ids = torch.tensor([f.input_ids for f in eval_features], dtype=torch.long)
     all_input_mask = torch.tensor([f.input_mask for f in eval_features], dtype=torch.long)
     all_segment_ids = torch.tensor([f.segment_ids for f in eval_features], dtype=torch.long)
-    if output_mode == "classification":
+    if args.output_mode == "classification":
         all_label_ids = torch.tensor([f.label_id for f in eval_features], dtype=torch.long)
-    elif output_mode == "regression":
+    elif args.output_mode == "regression":
         all_label_ids = torch.tensor([f.label_id for f in eval_features], dtype=torch.float)
 
     eval_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
     # Run prediction for full data
     eval_sampler = SequentialSampler(eval_data)
-    eval_dataloader = DataLoader(eval_data, sampler=eval_sampler, batch_size=8)
+    eval_dataloader = DataLoader(eval_data, sampler=eval_sampler, batch_size=args.eval_batch_size)
 
     model.eval()
     eval_loss = 0
@@ -181,16 +165,15 @@ def train_model(code, identifier):
 
     eval_loss = eval_loss / nb_eval_steps
     preds = preds[0]
-    if output_mode == "classification":
+    if args.output_mode == "classification":
         preds = np.argmax(preds, axis=1)
-    elif output_mode == "regression":
+    elif args.output_mode == "regression":
         preds = np.squeeze(preds)
         preds = np.rint(preds)
     df = pd.Series(preds)
 
     df.to_csv(os.path.join(output_dir,'_'.join([identifier,code,'preds.csv'])),
                                                                     index=False)
-
 
 def combine_predictions(identifier):
     output_dir = os.path.join(PROJECT_DIR,"output/separate")
@@ -208,7 +191,7 @@ def combine_predictions(identifier):
     df['DPT'] = df['data'].map('{0:g}'.format)+df['people'].map('{0:g}'.format)+df['things'].map('{0:g}'.format)
     df[['Title','Code','DPT']].to_csv(results_dir+'/'+identifier+'_preds.csv')
 
-def evaluate_predictions(identifier):
+def evaluate_model(identifier):
     results_dir = os.path.join(PROJECT_DIR,"results/separate")
     output_dir = os.path.join(PROJECT_DIR,"output/separate")
     pred_df = pd.read_csv(output_dir+'/'+identifier+'_preds.csv')
@@ -227,8 +210,18 @@ def evaluate_predictions(identifier):
         for key in sorted(result.keys()):
             writer.write("%s = %s\n" % (key, str(result[key])))
 
-train_model('data','reg_20e')
-train_model('people','reg_20e')
-train_model('things','reg_20e')
-combine_predictions('reg_20e')
-evaluate_predictions('reg_20e')
+parser = utils.model_options_parser()
+args = parser.parse_args()
+settings = vars(args)
+model_dir = os.path.join(PROJECT_DIR,"models/separate",args.identifier)
+os.makedirs(model_dir,exist_ok=True)
+json.dump(settings, open(model_dir+'/settings.txt', 'w'), indent=0)
+random.seed(args.seed)
+np.random.seed(args.seed)
+torch.manual_seed(args.seed)
+
+train_model('data',args)
+train_model('people',args)
+train_model('things',args)
+combine_predictions(args.identifier)
+evaluate_model(args.identifier)
