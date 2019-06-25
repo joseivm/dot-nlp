@@ -1,0 +1,7 @@
+{'Overall accuracy': 0.5407098121085595,
+ 'data accuracy': 0.7586638830897704,
+ 'data mean distance': 0.45887265135699373,
+ 'people accuracy': 0.8396659707724425,
+ 'people mean distance': 0.3494780793319415,
+ 'things accuracy': 0.7908141962421712,
+ 'things mean distance': 0.6584551148225469}

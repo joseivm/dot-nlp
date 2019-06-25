@@ -1,29 +1,6 @@
-from __future__ import absolute_import, division, print_function
-
-import argparse
 import csv
-import logging
 import os
-import random
-import sys
-
 import numpy as np
-import torch
-from torch.utils.data import (DataLoader, RandomSampler, SequentialSampler,
-                              TensorDataset)
-from torch.utils.data.distributed import DistributedSampler
-from tqdm import tqdm, trange
-
-from torch.nn import CrossEntropyLoss, MSELoss
-from scipy.stats import pearsonr, spearmanr
-from sklearn.metrics import matthews_corrcoef, f1_score
-
-from pytorch_pretrained_bert.file_utils import PYTORCH_PRETRAINED_BERT_CACHE, WEIGHTS_NAME, CONFIG_NAME
-from pytorch_pretrained_bert.modeling import BertForSequenceClassification, BertConfig
-from pytorch_pretrained_bert.tokenization import BertTokenizer
-from pytorch_pretrained_bert.optimization import BertAdam
-
-logger = logging.getLogger(__name__)
 
 
 class InputExample(object):
@@ -88,44 +65,15 @@ class DataProcessor(object):
 class DOTProcessor(DataProcessor):
     """Processor for the 1977 DOT data set"""
 
-    def get_train_examples(self, data_dir,code=''):
-        """See base class."""
-        lines = []
-        code_to_idx = {'data':0,'people':1,'things':2,'':None}
-        label_idx = code_to_idx[code]
-        with open(data_dir+'/train.csv','r',errors='ignore') as f:
-            reader = csv.reader(f)
-            for line in reader:
-                lines.append(line)
-        examples = []
-        set_type = 'train'
-        for (i, line) in enumerate(lines):
-            guid = "%s-%s" % (set_type, i)
-            text_a = line[2]
-            label = line[0][4:7]
-            label = label[label_idx] if code else label
-            label = int(label)
-            examples.append(InputExample(guid=guid, text_a=text_a, label=label))
+    def get_train_examples(self,data_dir,code=''):
+        lines = self.read_csv(data_dir+'/train.csv')
+        examples = self.create_examples(lines,'train',code)
         return examples
 
     def get_dev_examples(self, data_dir,code=''):
         """See base class."""
-        lines = []
-        code_to_idx = {'data':0,'people':1,'things':2,'':None}
-        label_idx = code_to_idx[code]
-        with open(data_dir+'/dev.csv','r',errors='ignore') as f:
-            reader = csv.reader(f)
-            for line in reader:
-                lines.append(line)
-        examples = []
-        set_type = 'dev'
-        for (i, line) in enumerate(lines):
-            guid = "%s-%s" % (set_type, i)
-            text_a = line[2]
-            label = line[0][4:7]
-            label = label[label_idx] if code else label
-            label = int(label)
-            examples.append(InputExample(guid=guid, text_a=text_a, label=label))
+        lines = self.read_csv(data_dir+'/dev.csv')
+        examples = self.create_examples(lines,'dev',code)
         return examples
 
     def get_labels(self,code=''):
@@ -133,18 +81,25 @@ class DOTProcessor(DataProcessor):
         labels = [None] if code else list(range(1000))
         return labels
 
-    def _create_examples(self, lines, set_type):
-        """Creates examples for the training and dev sets."""
+    def read_csv(self,input_file):
+        lines = []
+        with open(input_file,'r',errors='ignore') as f:
+            reader = csv.reader(f)
+            for line in reader:
+                lines.append(line)
+        return lines
+
+    def create_examples(self,lines,set_type,code=''):
         examples = []
+        code_to_idx = {'data':0,'people':1,'things':2,'':None}
+        label_idx = code_to_idx[code]
         for (i, line) in enumerate(lines):
-            if i == 0:
-                continue
             guid = "%s-%s" % (set_type, i)
             text_a = line[2]
-            label = int(line[0][4:7])
-            label = self.to_three_digit(label)
-            examples.append(
-                InputExample(guid=guid, text_a=text_a, label=label))
+            label = line[0][4:7]
+            label = label[label_idx] if code else label
+            label = int(label)
+            examples.append(InputExample(guid=guid, text_a=text_a, label=label))
         return examples
 
     def convert_examples_to_features(self, examples, label_list, max_seq_length,
