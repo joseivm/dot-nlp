@@ -37,12 +37,13 @@ def train_model(code, args):
     output_dir = os.path.join(PROJECT_DIR,"output/separate")
 
     processor = fb.DOTProcessor()
-    labels = processor.get_labels(code)
+    classification = args.output_mode == 'classification'
+    labels = processor.get_labels(code,classification)
     num_labels = len(labels)
     tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.lower_case)
     train_examples = processor.get_train_examples(data_dir,code)
     cache_dir = os.path.join(str(PYTORCH_PRETRAINED_BERT_CACHE), 'distributed_{}'.format(-1))
-    model = BertForSequenceClassification.from_pretrained(args.bertbert_model,cache_dir=cache_dir,
+    model = BertForSequenceClassification.from_pretrained(args.bert_model,cache_dir=cache_dir,
                   num_labels=num_labels)
 
     num_train_optimization_steps = int(len(train_examples)*args.num_train_epochs)
@@ -118,7 +119,7 @@ def train_model(code, args):
 
     eval_examples = processor.get_dev_examples(data_dir,code)
     eval_features = processor.convert_examples_to_features(
-        eval_examples, labels, args.max_seq_length, tokenizer, output_mode)
+        eval_examples, labels, args.max_seq_length, tokenizer, args.output_mode)
 
 
     all_input_ids = torch.tensor([f.input_ids for f in eval_features], dtype=torch.long)
@@ -148,10 +149,10 @@ def train_model(code, args):
         with torch.no_grad():
             logits = model(input_ids, segment_ids, input_mask, labels=None)
 
-        if output_mode == "classification":
+        if args.output_mode == "classification":
             loss_fct = CrossEntropyLoss()
             tmp_eval_loss = loss_fct(logits.view(-1, num_labels), label_ids.view(-1))
-        elif output_mode == "regression":
+        elif args.output_mode == "regression":
             loss_fct = MSELoss()
             tmp_eval_loss = loss_fct(logits.view(-1), label_ids.view(-1))
 
@@ -185,17 +186,16 @@ def combine_predictions(identifier):
     for code in codes:
         pred_path = os.path.join(output_dir,'_'.join([identifier,code,'preds.csv']))
         code_preds = pd.read_csv(pred_path,header=None)[0]
-        df.loc[:,code] = code_preds
+        df.loc[:,code] = np.maximum(code_preds,0)
 
     df.drop(columns='Description',inplace=True)
     df['DPT'] = df['data'].map('{0:g}'.format)+df['people'].map('{0:g}'.format)+df['things'].map('{0:g}'.format)
-    df[['Title','Code','DPT']].to_csv(results_dir+'/'+identifier+'_preds.csv')
+    df[['Title','Code','DPT']].to_csv(output_dir+'/'+identifier+'_preds.csv')
 
 def evaluate_model(identifier):
     results_dir = os.path.join(PROJECT_DIR,"results/separate")
     output_dir = os.path.join(PROJECT_DIR,"output/separate")
     pred_df = pd.read_csv(output_dir+'/'+identifier+'_preds.csv')
-    results_dir = os.path.join(PROJECT_DIR,"results")
     data_dir = os.path.join(PROJECT_DIR,"data/1977")
     df = pd.read_csv(data_dir+'/dev.csv',header=None)
     df.columns = ['Code','Title','Description']
@@ -203,7 +203,7 @@ def evaluate_model(identifier):
     labels = df['Code'].str.slice(start=4,stop=7)
     preds = pred_df['DPT']
 
-    results = eu.evaluate_predictions(preds,labels)
+    result = eu.evaluate_predictions(preds,labels)
     output_eval_file = os.path.join(results_dir, identifier+"_eval_results.txt")
 
     with open(output_eval_file, "w") as writer:

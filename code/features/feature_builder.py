@@ -128,9 +128,15 @@ class DOTProcessor(DataProcessor):
             examples.append(InputExample(guid=guid, text_a=text_a, label=label))
         return examples
 
-    def get_labels(self,code=''):
+    def get_labels(self,code='',classification=True):
         """See base class."""
-        labels = [None] if code else list(range(1000))
+        if code and classification:
+            labels = list(range(10))
+        elif code:
+            labels = [None]
+        else:
+            labels = list(range(1000))
+        # labels = [None] if code else list(range(1000))
         return labels
 
     def _create_examples(self, lines, set_type):
