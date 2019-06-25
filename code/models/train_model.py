@@ -177,7 +177,7 @@ def train_model(args):
     df['DPT'] = preds
     df = df[['Title','Code','DPT']]
     labels = df['Code'].str.slice(start=4,stop=7)
-    df.to_csv(os.path.join(output_dir,identifier+'preds.csv'),index=False)
+    df.to_csv(os.path.join(output_dir,identifier+'_preds.csv'),index=False)
     result = eu.evaluate_predictions(preds,labels)
     output_eval_file = os.path.join(results_dir,identifier+ "_eval_results.txt")
 
@@ -185,14 +185,34 @@ def train_model(args):
         for key in sorted(result.keys()):
             writer.write("%s = %s\n" % (key, str(result[key])))
 
-parser = utils.model_options_parser()
-args = parser.parse_args()
-settings = vars(args)
-model_dir = os.path.join(PROJECT_DIR,"models/joint",args.identifier)
-os.makedirs(model_dir,exist_ok=True)
-json.dump(settings, open(model_dir+'/settings.txt', 'w'), indent=0)
-random.seed(args.seed)
-np.random.seed(args.seed)
-torch.manual_seed(args.seed)
+def evaluate_model(identifier):
+    results_dir = os.path.join(PROJECT_DIR,"results/joint")
+    output_dir = os.path.join(PROJECT_DIR,"output/joint")
+    pred_df = pd.read_csv(output_dir+'/'+identifier+'_preds.csv')
+    results_dir = os.path.join(PROJECT_DIR,"results")
+    data_dir = os.path.join(PROJECT_DIR,"data/1977")
+    df = pd.read_csv(data_dir+'/dev.csv',header=None)
+    df.columns = ['Code','Title','Description']
 
-train_model(args)
+    labels = df['Code'].str.slice(start=4,stop=7)
+    preds = pred_df['DPT']
+
+    results = eu.evaluate_predictions(preds,labels)
+    output_eval_file = os.path.join(results_dir, identifier+"_eval_results.txt")
+
+    with open(output_eval_file, "w") as writer:
+        for key in sorted(result.keys()):
+            writer.write("%s = %s\n" % (key, str(result[key])))
+
+# parser = utils.model_options_parser()
+# args = parser.parse_args()
+# settings = vars(args)
+# model_dir = os.path.join(PROJECT_DIR,"models/joint",args.identifier)
+# os.makedirs(model_dir,exist_ok=True)
+# json.dump(settings, open(model_dir+'/settings.txt', 'w'), indent=0)
+# random.seed(args.seed)
+# np.random.seed(args.seed)
+# torch.manual_seed(args.seed)
+#
+# train_model(args)
+evaluate_model('20epochs')
