@@ -41,7 +41,7 @@ def train_model(args):
     labels = processor.get_labels()
     num_labels = len(labels)
     tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.lower_case)
-    train_examples = processor.get_train_examples(data_dir,code)
+    train_examples = processor.get_train_examples(data_dir)
     cache_dir = os.path.join(str(PYTORCH_PRETRAINED_BERT_CACHE), 'distributed_{}'.format(-1))
     model = BertForSequenceClassification.from_pretrained(args.bert_model,cache_dir=cache_dir,
                   num_labels=num_labels)
@@ -78,7 +78,7 @@ def train_model(args):
     device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
     model.to(device)
     model.train()
-    for _ in trange(int(num_train_epochs), desc="Epoch"):
+    for _ in trange(int(args.num_train_epochs), desc="Epoch"):
         tr_loss = 0
         nb_tr_examples, nb_tr_steps = 0, 0
         for step, batch in enumerate(tqdm(train_dataloader, desc="Iteration")):
@@ -117,7 +117,7 @@ def train_model(args):
 
     model.to(device)
 
-    eval_examples = processor.get_dev_examples(data_dir,code)
+    eval_examples = processor.get_dev_examples(data_dir)
     eval_features = processor.convert_examples_to_features(
         eval_examples, labels, args.max_seq_length, tokenizer, args.output_mode)
 
@@ -177,9 +177,9 @@ def train_model(args):
     df['DPT'] = preds
     df = df[['Title','Code','DPT']]
     labels = df['Code'].str.slice(start=4,stop=7)
-    df.to_csv(os.path.join(output_dir,identifier+'_preds.csv'),index=False)
-    result = eu.evaluate_predictions(preds,labels)
-    output_eval_file = os.path.join(results_dir,identifier+ "_eval_results.txt")
+    df.to_csv(os.path.join(output_dir,args.identifier+'_preds.csv'),index=False)
+    result = eu.evaluate_predictions(df['DPT'],labels)
+    output_eval_file = os.path.join(results_dir,args.identifier+ "_eval_results.txt")
 
     with open(output_eval_file, "w") as writer:
         for key in sorted(result.keys()):
@@ -197,22 +197,22 @@ def evaluate_model(identifier):
     labels = df['Code'].str.slice(start=4,stop=7)
     preds = pred_df['DPT']
 
-    results = eu.evaluate_predictions(preds,labels)
+    result = eu.evaluate_predictions(preds,labels)
     output_eval_file = os.path.join(results_dir, identifier+"_eval_results.txt")
 
     with open(output_eval_file, "w") as writer:
         for key in sorted(result.keys()):
             writer.write("%s = %s\n" % (key, str(result[key])))
 
-# parser = utils.model_options_parser()
-# args = parser.parse_args()
-# settings = vars(args)
-# model_dir = os.path.join(PROJECT_DIR,"models/joint",args.identifier)
-# os.makedirs(model_dir,exist_ok=True)
-# json.dump(settings, open(model_dir+'/settings.txt', 'w'), indent=0)
-# random.seed(args.seed)
-# np.random.seed(args.seed)
-# torch.manual_seed(args.seed)
-#
-# train_model(args)
-evaluate_model('20epochs')
+parser = utils.model_options_parser()
+args = parser.parse_args()
+settings = vars(args)
+model_dir = os.path.join(PROJECT_DIR,"models/joint",args.identifier)
+os.makedirs(model_dir,exist_ok=True)
+json.dump(settings, open(model_dir+'/settings.txt', 'w'), indent=0)
+random.seed(args.seed)
+np.random.seed(args.seed)
+torch.manual_seed(args.seed)
+
+train_model(args)
+evaluate_model(args.identifier)
