@@ -32,7 +32,8 @@ import eval_utils as eu
 import utils
 
 def train_model(args):
-    data_dir = os.path.join(PROJECT_DIR,"data/1977")
+    train_data_dir = os.path.join(PROJECT_DIR,"data",args.train_year)
+    eval_data_dir = os.path.join(PROJECT_DIR,"data",args.eval_year)
     model_dir = os.path.join(PROJECT_DIR,"models/joint",args.identifier)
     results_dir = os.path.join(PROJECT_DIR,"results/joint")
     output_dir = os.path.join(PROJECT_DIR,"output/joint")
@@ -41,7 +42,7 @@ def train_model(args):
     labels = processor.get_labels()
     num_labels = len(labels)
     tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.lower_case)
-    train_examples = processor.get_train_examples(data_dir)
+    train_examples = processor.get_train_examples(train_data_dir)
     cache_dir = os.path.join(str(PYTORCH_PRETRAINED_BERT_CACHE), 'distributed_{}'.format(-1))
     model = BertForSequenceClassification.from_pretrained(args.bert_model,cache_dir=cache_dir,
                   num_labels=num_labels)
@@ -117,7 +118,7 @@ def train_model(args):
 
     model.to(device)
 
-    eval_examples = processor.get_dev_examples(data_dir)
+    eval_examples = processor.get_dev_examples(eval_data_dir)
     eval_features = processor.convert_examples_to_features(
         eval_examples, labels, args.max_seq_length, tokenizer, args.output_mode)
 
@@ -172,7 +173,7 @@ def train_model(args):
         preds = np.squeeze(preds)
         preds = np.rint(preds)
 
-    df = pd.read_csv(data_dir+'/dev.csv',header=None)
+    df = pd.read_csv(eval_data_dir+'/dev.csv',header=None)
     df.columns = ['Code','Title','Description']
     df['DPT'] = preds
     df = df[['Title','Code','DPT']]
@@ -185,12 +186,12 @@ def train_model(args):
         for key in sorted(result.keys()):
             writer.write("%s = %s\n" % (key, str(result[key])))
 
-def evaluate_model(identifier):
+def evaluate_model(identifier,eval_year):
     results_dir = os.path.join(PROJECT_DIR,"results/joint")
     output_dir = os.path.join(PROJECT_DIR,"output/joint")
     pred_df = pd.read_csv(output_dir+'/'+identifier+'_preds.csv')
     results_dir = os.path.join(PROJECT_DIR,"results")
-    data_dir = os.path.join(PROJECT_DIR,"data/1977")
+    data_dir = os.path.join(PROJECT_DIR,"data",eval_year)
     df = pd.read_csv(data_dir+'/dev.csv',header=None)
     df.columns = ['Code','Title','Description']
 

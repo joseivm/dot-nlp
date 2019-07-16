@@ -2,12 +2,14 @@ import re
 import csv
 import random
 import math
+import os
 
-DOT_1977_PATH = '/Users/joseivelarde/Projects/dot-nlp/data/raw/1977_Output.txt'
-OUTFILE = '/Users/joseivelarde/Projects/dot-nlp/data/clean/structured_1977.csv'
-DATA_DIR = '/Users/joseivelarde/Projects/dot-nlp/data/1977/'
+DOT_1977_PATH = '/Users/joseivelarde/dot-nlp/data/raw/1977_Output.txt'
+DOT_1965_PATH = '/Users/joseivelarde/dot-nlp/data/raw/1965_Output.txt'
+OUTFILE = '/Users/joseivelarde/dot-nlp/data/clean/structured_1977.csv'
+DATA_DIR = '/Users/joseivelarde/dot-nlp/data/'
 
-class TitleParser:
+class TitleParser77:
     def __init__(self):
         self.title_regex = re.compile('^[\d]{2}[\-\.\s\d]{0,11}[A-Z]+[A-Z\-,\s]*')
         self.code_regex = re.compile("\d{3}.\d{3}[-\s]{1,2}\d{3}")
@@ -38,7 +40,27 @@ class TitleParser:
         code_match = self.code_regex.search(title)
         return code_match.group(0)
 
-def load_dot():
+class TitleParser65:
+    def __init__(self):
+        self.code_regex = re.compile("[\d]{3}[\s\.]{1,4}[\d]{3}")
+        self.code_counter = {}
+
+    def has_code(self,line):
+        code_match = self.code_regex.search(line)
+        return code_match is not None
+
+    def make_code_unique(self,code):
+        code_count = self.code_counter.get(code,0)+1
+        self.code_counter[code] = code_count
+        return code[:3] + '.' + code[-3:] + '.' + str(code_count)
+
+    def get_code(self,title):
+        code_match = self.code_regex.search(title)
+        code = re.sub('[^\d]','',code_match.group(0))
+        code = self.make_code_unique(code)
+        return code
+
+def load_77_dot():
     with open(DOT_1977_PATH,'rb') as f:
         dot = f.readlines()
     dot = [line.decode('utf-8',errors='ignore') for line in dot]
@@ -46,8 +68,8 @@ def load_dot():
     dot = [line for line in dot if line != '']
     return dot
 
-def make_occ_dictionary(dot):
-    tp = TitleParser()
+def make_77_occ_dictionary(dot):
+    tp = TitleParser77()
     definitions = {}
     current_title = ''
     current_definition = ''
@@ -67,8 +89,8 @@ def make_occ_dictionary(dot):
             current_definition += line
     return definitions
 
-def write_set(definitions,set_type):
-    outfile = DATA_DIR+set_type+'.csv'
+def write_set(definitions,edition,set_type):
+    outfile = os.path.join(DATA_DIR,edition,set_type)+'.csv'
     with open(outfile,'w') as csv_file:
         writer = csv.writer(csv_file)
         for key, value in definitions.items():
@@ -98,10 +120,43 @@ def train_dev_test_split(definitions):
 
     return({'train':train_definitions,'dev':dev_definitions,'test':test_definitions})
 
-dot = load_dot()
-definitions = make_occ_dictionary(dot)
+def load_65_dot():
+    with open(DOT_1965_PATH,'r',errors='ignore') as f:
+        lines = f.readlines()
+    dot = [line.rstrip() for line in lines]
+    return dot
+
+def make_65_occ_dictionary(dot):
+    tp = TitleParser65()
+    definitions = {}
+    collecting = False
+    # Go line by line, if line is a code, start saving definition
+    # until you come across another code or newline. Once you come across a
+    # stopping point, save your definition and look for another code.
+    for line in dot:
+        if not collecting:
+            if tp.has_code(line):
+                collecting = True
+                current_code = tp.get_code(line)
+                current_definition = ''
+            else:
+                pass
+        else:
+            if not line:
+                collecting = False
+                definitions[current_code] = ('no title',current_definition)
+            elif tp.has_code(line):
+                definitions[current_code] = ('no title',current_definition)
+                current_code = tp.get_code(line)
+                current_definition = ''
+            else:
+                current_definition += line
+    return definitions
+
+dot = load_65_dot()
+definitions = make_65_occ_dictionary(dot)
 datasets = train_dev_test_split(definitions)
 
-write_set(datasets['train'],'train')
-write_set(datasets['dev'],'dev')
-write_set(datasets['test'],'test')
+write_set(datasets['train'],'1965','train')
+write_set(datasets['dev'],'1965','dev')
+write_set(datasets['test'],'1965','test')

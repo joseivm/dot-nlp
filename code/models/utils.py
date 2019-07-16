@@ -15,6 +15,10 @@ def model_options_parser():
                         help="model identifier")
 
     ## Other parameters
+    parser.add_argument("--train_year",default='1977',type=str,
+                        help="What version of the DOT to use for training")
+    parser.add_argument("--eval_year",default='1977',type=str,
+                        help="What version of the DOT to use for testing")
     parser.add_argument("--max_seq_length",
                         default=128,
                         type=int,
