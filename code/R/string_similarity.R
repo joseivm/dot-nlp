@@ -44,6 +44,23 @@ match <- function(unmatched_occs,occ_list,threshold=0.9){
   fwrite(occ_matches,'~/dot-nlp/data/clean/occ_matches.csv')
 }
 
+census_file <- '~/dot-nlp/data/clean/census_occ_counts.csv'
+census_stats <- fread(census_file)
+census_stats[, Title := tolower(occstr)]
+census_occ_counts <- census_stats[,.(N=sum(count)),by=Title]
+census_occ_counts <- census_occ_counts[order(-N)]
+dot <- fread('dot-nlp/data/raw/1939_structured.csv')
+dot[, Title := gsub("\\(.+\\)",'',job_title)]
+dot[, Title := gsub("\\.",'',Title)]
+dot[, Title := trimws(Title)]
+dot[, Title := tolower(Title)]
+all_titles <- c()
+for (title in dot$Title){
+  sub_titles <- unlist(strsplit(title,";"))
+  sub_titles <- trimws(sub_titles)
+  all_titles <- c(all_titles,sub_titles)
+}
+
 dot <- load_dot()
 cens <- fread(census_file)
 unmatched_occs <- cens[!(Title %in% dot$Title),.N,by=Title]$Title
