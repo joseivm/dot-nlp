@@ -1,0 +1,7 @@
+Overall accuracy = 0.1269311064718163
+data accuracy = 0.3544885177453027
+data mean distance = 1.432150313152401
+people accuracy = 0.8150313152400835
+people mean distance = 0.42004175365344465
+things accuracy = 0.6580375782881002
+things mean distance = 0.8592901878914405
