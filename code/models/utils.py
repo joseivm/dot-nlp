@@ -15,6 +15,8 @@ def model_options_parser():
                         help="model identifier")
 
     ## Other parameters
+    parser.add_argument("--patience",default=10,type=int,
+                        help="Early stopping trigger")
     parser.add_argument("--train_year",default='1977',type=str,
                         help="What version of the DOT to use for training")
     parser.add_argument("--eval_year",default='1977',type=str,
@@ -53,6 +55,8 @@ def model_options_parser():
                         type=float,
                         help="Proportion of training to perform linear learning rate warmup for. "
                              "E.g., 0.1 = 10%% of training.")
+    parser.add_argument("--cuda_device", default='2',type=str,
+                        help="CUDA device number to use")
     parser.add_argument("--local_rank",
                         type=int,
                         default=-1,
