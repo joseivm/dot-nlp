@@ -2,6 +2,7 @@
 notebooks/
 .DS_Store
 documents/transcription-1965/
+documents/transcription-1977/
 models/**/*.txt
 models/**/*.bin
 models/**/*.json
