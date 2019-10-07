@@ -328,8 +328,9 @@ def train_model2(args):
                 if epochs_no_improve >= args.patience:
                     print(f'Finished training in {epoch} epochs')
 
-def evaluate_model2(identifier,eval_year,cuda_device='2'):
+def evaluate_model2(identifier,eval_year,cuda_device='2',test=True):
     device = 'cuda:' + cuda_device
+    eval_type = 'test' if test else 'eval'
     results_dir = os.path.join(PROJECT_DIR,"results/joint")
     output_dir = os.path.join(PROJECT_DIR,"output/joint")
     model_dir = os.path.join(PROJECT_DIR,"models/joint",identifier)
@@ -347,7 +348,10 @@ def evaluate_model2(identifier,eval_year,cuda_device='2'):
 
     model.to(device)
 
-    eval_examples = processor.get_dev_examples(eval_data_dir)
+    if test:
+        eval_examples = processor.get_test_examples(eval_data_dir)
+    else:
+        eval_examples = processor.get_dev_examples(eval_data_dir)
     eval_features = processor.convert_examples_to_features(
         eval_examples, labels, model_args['max_seq_length'], tokenizer, model_args['output_mode'])
 
@@ -402,14 +406,14 @@ def evaluate_model2(identifier,eval_year,cuda_device='2'):
         preds = np.squeeze(preds)
         preds = np.rint(preds)
 
-    df = pd.read_csv(eval_data_dir+'/dev.csv',header=None)
+    df = pd.read_csv(eval_data_dir+'/'+eval_type+ '.csv',header=None)
     df.columns = ['Code','Title','Description']
     df['DPT'] = preds
     df = df[['Title','Code','DPT']]
     labels = df['Code'].str.slice(start=4,stop=7)
-    df.to_csv(os.path.join(output_dir,identifier+'_'+eval_year+'_preds.csv'),index=False)
+    df.to_csv(os.path.join(output_dir,identifier+'_'+eval_year+'_'+eval_type+'_preds.csv'),index=False)
     result = eu.evaluate_predictions(df['DPT'],labels)
-    output_eval_file = os.path.join(results_dir,identifier+'_' + eval_year + "_eval_results.txt")
+    output_eval_file = os.path.join(results_dir,identifier+'_' + eval_year + "_"+eval_type +"_results.txt")
 
     with open(output_eval_file, "w") as writer:
         for key in sorted(result.keys()):
