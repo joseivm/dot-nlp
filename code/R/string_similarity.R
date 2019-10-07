@@ -24,6 +24,17 @@ get_similar_titles <- function(occ,occ_list,threshold=0.8,p=0.1){
   return(sim_titles)
 }
 
+find_match <- function(occ,occ_list,threshold=0.07){
+  distances <- stringdist(occ,occ_list,method='jw',p=0.1)
+  min_idx <- which.min(distances)
+  if (min(distances) <= threshold){
+    match <- occ_list[min_idx]
+  }else{
+    match <- NA
+  }
+  return(match)
+}
+
 match <- function(unmatched_occs,occ_list,threshold=0.9){
   occ_matches <- data.table('Census Occupation'=character(),'DOT Match'=character())
   i <- 1

@@ -153,6 +153,7 @@ def make_65_occ_dictionary(dot):
                 current_definition += line
     return definitions
 
+#TODO: add main function
 dot = load_65_dot()
 definitions = make_65_occ_dictionary(dot)
 datasets = train_dev_test_split(definitions)
