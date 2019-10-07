@@ -76,6 +76,12 @@ class DOTProcessor(DataProcessor):
         examples = self.create_examples(lines,'dev',code)
         return examples
 
+    def get_test_examples(self, data_dir,code=''):
+        """See base class."""
+        lines = self.read_csv(data_dir+'/test.csv')
+        examples = self.create_examples(lines,'test',code)
+        return examples
+
     def get_labels(self,code=''):
         """See base class."""
         labels = [None] if code else list(range(1000))
