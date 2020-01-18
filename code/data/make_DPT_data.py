@@ -9,7 +9,7 @@ DOT_1965_PATH = '/Users/joseivelarde/dot-nlp/data/raw/1965_Output.txt'
 OUTFILE = '/Users/joseivelarde/dot-nlp/data/clean/structured_1977.csv'
 DATA_DIR = '/Users/joseivelarde/dot-nlp/data/'
 
-class TitleParser77:
+class DPTParser77:
     def __init__(self):
         self.title_regex = re.compile('^[\d]{2}[\-\.\s\d]{0,11}[A-Z]+[A-Z\-,\s]*')
         self.code_regex = re.compile("\d{3}.\d{3}[-\s]{1,2}\d{3}")
@@ -40,7 +40,7 @@ class TitleParser77:
         code_match = self.code_regex.search(title)
         return code_match.group(0)
 
-class TitleParser65:
+class DPTParser65:
     def __init__(self):
         self.code_regex = re.compile("[\d]{3}[\s\.]{1,4}[\d]{3}")
         self.code_counter = {}
@@ -68,7 +68,8 @@ def load_77_dot():
     dot = [line for line in dot if line != '']
     return dot
 
-def make_77_occ_dictionary(dot):
+def make_77_occ_dictionary():
+    dot = load_77_dot()
     tp = TitleParser77()
     definitions = {}
     current_title = ''
@@ -90,11 +91,16 @@ def make_77_occ_dictionary(dot):
     return definitions
 
 def write_set(definitions,edition,set_type):
-    outfile = os.path.join(DATA_DIR,edition,set_type)+'.csv'
+    outfile = os.path.join(DATA_DIR,'dpt',edition,set_type)+'.csv'
     with open(outfile,'w') as csv_file:
         writer = csv.writer(csv_file)
         for key, value in definitions.items():
             writer.writerow([key,value[0],value[1]])
+
+def save_data(definitions,year):
+    write_set(definitions['train'],year,'train')
+    write_set(definitions['dev'],year,'dev')
+    write_set(definitions['test'],year,'test')
 
 def train_dev_test_split(definitions):
     N = len(definitions)
@@ -126,7 +132,8 @@ def load_65_dot():
     dot = [line.rstrip() for line in lines]
     return dot
 
-def make_65_occ_dictionary(dot):
+def make_65_occ_dictionary():
+    dot = load_65_dot()
     tp = TitleParser65()
     definitions = {}
     collecting = False
@@ -153,11 +160,8 @@ def make_65_occ_dictionary(dot):
                 current_definition += line
     return definitions
 
-#TODO: add main function
-dot = load_65_dot()
-definitions = make_65_occ_dictionary(dot)
-datasets = train_dev_test_split(definitions)
-
-write_set(datasets['train'],'1965','train')
-write_set(datasets['dev'],'1965','dev')
-write_set(datasets['test'],'1965','test')
+def main():
+    definitions_77 = make_77_occ_dictionary()
+    save_data(definitions_77,'1977')
+    definitions_65 = make_65_occ_dictionary()
+    save_data(definitions_65,'1965')

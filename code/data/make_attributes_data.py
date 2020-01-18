@@ -2,17 +2,15 @@ import pandas as pd
 import os
 import re
 import numpy as np
+import jellyfish as jf
 from dotenv import load_dotenv, find_dotenv
 dotenv_path = find_dotenv()
 load_dotenv(dotenv_path)
 
 PROJECT_DIR = os.environ.get("PROJECT_DIR")
+RANDOM_STATE = 1
 
-# Procedure: load dot and metadata, parse dot, clean dot title and industry col,
-# clean metadata title and industry column, zip, match.
-
-# TODO: add fuzzy matching
-
+##### Parsing Classes #####
 class ParserHelper:
     def __init__(self):
         self.code_regex = re.compile("[\d]{3}[\s\.]{1,4}[\d]{3}")
@@ -71,7 +69,7 @@ class ParserHelper:
         line = re.sub(self.code_regex,'',line)
         return line
 
-class DOTParser:
+class AttributesParser65:
     def __init__(self):
         self.ph = ParserHelper()
         self.title_searching = True
@@ -138,6 +136,54 @@ class DOTParser:
         df = df.drop_duplicates('FullTitle',keep=False)
         return df
 
+class AttributesParser91:
+    def __init__(self):
+        self.definitions = []
+
+    def parse(self,dot):
+        for line in dot:
+            entry = {}
+            dot_code = line[8:16]
+            definition_type = line[16]
+            update_date = line[17:19]
+            dpt_code = line[19:25]
+            ged_read = line[25]
+            ged_math = line[26]
+            lang = line[27]
+            svp = line[28]
+            gen_learn = line[29]
+            verbal = line[30]
+            numerical = line[31]
+            spacial = line[32]
+            form_per = line[33]
+            clerical_per = line[34]
+            motor_coord = line[35]
+            finger_dext = line[36]
+            manual_dext = line[37]
+            eye_hand = line[38]
+            color_disc = line[39]
+            temp = line[58:67]
+            soc_code = line[73:77]
+            title = line[111:179]
+            industry = line[179:243]
+            definition = line[243:-2]
+            entry['Title'] = title
+            entry['Industry'] = industry
+            entry['Code'] = dot_code
+            entry['Definition'] = definition
+            entry['GED'] = ged_math
+            entry['EHFCoord'] = eye_hand
+            entry['FingerDexterity'] = finger_dext
+            entry['DCP'] = 1 if 'D' in temp else 0
+            entry['STS'] = 1 if 'T' in temp else 0
+            entry['DLU'] = update_date
+            self.definitions.append(entry)
+
+        df = pd.DataFrame(self.definitions)
+        df.loc[:,'Definition'] = df['Definition'].str.strip()
+        return(pd.DataFrame(self.definitions))
+
+##### Data Loading Functions #####
 def load_metadata():
     md = pd.read_excel(PROJECT_DIR +'/data/raw/1965_metadata.xlsx')
     md = clean_column(md,'Title','CleanedTitle')
@@ -147,7 +193,13 @@ def load_metadata():
     md = md.drop_duplicates('FullTitle',keep=False)
     return(md)
 
-def load_dot():
+def load_91_dot():
+    filepath = os.path.join(PROJECT_DIR,'data','raw','DOT1991.txt')
+    with open(filepath,'r',errors='ignore') as f:
+        lines = f.readlines()
+    return(lines)
+
+def load_65_dot():
     with open('/Users/joseivelarde/dot-nlp/data/raw/1965_Output.txt','r',errors='ignore') as f:
         lines = f.readlines()
     dot = [line.rstrip() for line in lines]
@@ -165,6 +217,26 @@ def clean_column(df,col_to_clean,new_name):
 def remove_extra_spaces(title):
     title = str(title)
     return(' '.join(title.split()))
+
+##### Data Creation functions #####
+def make_1965_data():
+    dot_text = load_dot()
+    md = load_metadata()
+    parser = AttributesParser65()
+    df = parser.parse(dot_text)
+    md = md.merge(df[['FullTitle','Definition']],on='FullTitle',how='left')
+    md = fuzzy_match(md,df)
+    md.loc[md.FuzzyScore >= 0.95,'Definition'] = md.loc[md.FuzzyScore >= 0.95,'FuzzyDefinition']
+    md = md.loc[md.Definition.notna()]
+    md = add_outcomes(md)
+    md = md[['Code','Title','Industry','Definition','GED','EHFCoord','FingerDexterity','DCP','STS']]
+    return(md)
+
+def make_1991_data():
+    dot = load_91_dot()
+    parser = AttributesParser91()
+    df = parser.parse(dot)
+    return(df)
 
 def fuzzy_match(md,df):
     unmatched_md = md.loc[~md['FullTitle'].isin(df['FullTitle']),:]
@@ -184,13 +256,38 @@ def find_fuzzy_match(title,title_list):
     match_title = title_list.loc[max_index]
     return(match_title, max_similarity)
 
-def make_attributes_data():
-    dot_text = load_dot()
-    md = load_metadata()
-    parser = DOTParser()
-    df = parser.parse(dot_text)
-    md = md.merge(df[['FullTitle','Definition']],on='FullTitle',how='left')
-    md = fuzzy_match(md,df)
-    md.loc[md.FuzzyScore >= 0.95,'Definition'] = md.loc[md.FuzzyScore >= 0.95,'FuzzyDefinition']
-    md = md.loc[md.Definition.notna()]
+def compute_midpoint(code):
+    code = re.sub(' ','',code)
+    codes = [int(subcode) for subcode in code]
+    return np.mean(codes)
+
+def add_outcomes(md):
+    md['GED'] = md['GED'].apply(str).apply(compute_midpoint)
+    md['EHFCoord'] = md['E'].apply(str).apply(compute_midpoint)
+    md['FingerDexterity'] = md['F'].apply(str).apply(compute_midpoint)
+    md['DCP'] = md['Temp'].str.contains('4')
+    md['STS'] = md['Temp'].str.contains('Y')
     return(md)
+
+##### Data Saving Functions #####
+def save_data(df,year):
+    train, val, test = train_val_test_split(df)
+    write_set(train,year,'train')
+    write_set(val,year,'dev')
+    write_set(test,year,'test')
+
+def train_val_test_split(df,train_size=0.6,val_size=0.2,test_size=0.2):
+    train_idx = int(train_size*len(df))
+    val_idx = int((train_size+val_size)*len(df))
+    train, val, test = np.split(df.sample(frac=1), [train_idx, val_idx],random_state=RANDOM_STATE)
+    return(train, val, test)
+
+def write_set(df,year,set_type):
+    outfile = os.path.join(DATA_DIR,'attributes',year,set_type)+'.csv'
+    df.to_csv(outfile,index=False)
+
+def main():
+    dot_1965 = make_1965_data()
+    save_data(dot_1965,'1965')
+    dot_1991 = make_1991_data()
+    save_data(dot_1991,'1991')
