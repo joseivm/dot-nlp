@@ -70,3 +70,67 @@ def model_options_parser():
                         default=1,
                         help="Number of updates steps to accumulate before performing a backward/update pass.")
     return parser
+
+def roberta_parser():
+    parser = argparse.ArgumentParser()
+
+    ## Required parameters
+    parser.add_argument("--task_name", default=None, type=str, required=True,
+                        help="The name of the task to train selected in the list: DPT or Attr")
+    parser.add_argument("--identifier",
+                        default=None,
+                        type=str,
+                        required=True,
+                        help="model identifier")
+
+    ## Other parameters
+    parser.add_argument("--max_seq_length",
+                        default=128,
+                        type=int,
+                        help="The maximum total input sequence length after tokenization. Sequences longer "
+                             "than this will be truncated, sequences shorter will be padded.")
+    parser.add_argument("--do_train",
+                        action='store_true',
+                        help="Whether to run training.")
+    parser.add_argument("--do_eval",
+                        action='store_true',
+                        help="Whether to run eval on the dev set.")
+    parser.add_argument("--train_year",
+                        default='1977',
+                        type=str,
+                        help="What year to use for training data")
+    parser.add_argument("--eval_year",
+                        default='1977',
+                        type=str,
+                        help="What year to use for validation data")
+    parser.add_argument("--do_lower_case",
+                        action='store_true',
+                        help="Set this flag if you are using an uncased model.")
+    parser.add_argument("--train_batch_size",
+                        default=8,
+                        type=int,
+                        help="Batch size per GPU/CPU for training.")
+    parser.add_argument("--eval_batch_size",
+                        default=8, type=int,
+                        help="Batch size per GPU/CPU for evaluation.")
+    parser.add_argument('--gradient_accumulation_steps',
+                        type=int,
+                        default=1,
+                        help="Number of updates steps to accumulate before performing a backward/update pass.")
+    parser.add_argument("--num_train_epochs",
+                        default=3.0,
+                        type=float,
+                        help="Total number of training epochs to perform.")
+    parser.add_argument("--patience",
+                        default=10,
+                        type=int,
+                        help="Early stopping trigger")
+    parser.add_argument('--seed',
+                        type=int,
+                        default=42,
+                        help="random seed for initialization")
+    parser.add_argument('--device',
+                        type=str,
+                        default='cuda:2',
+                        help="CUDA device to use")
+    return parser

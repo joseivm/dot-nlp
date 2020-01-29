@@ -1,25 +1,30 @@
-import pandas as pd
 import os
 import re
+import pandas as pd
 import numpy as np
 import jellyfish as jf
+import data_utils as du
+
 from dotenv import load_dotenv, find_dotenv
 dotenv_path = find_dotenv()
 load_dotenv(dotenv_path)
 
 PROJECT_DIR = os.environ.get("PROJECT_DIR")
-RANDOM_STATE = 1
+DATA_DIR = os.path.join(PROJECT_DIR,'data')
 
 ##### Parsing Classes #####
 class ParserHelper:
     def __init__(self):
         self.code_regex = re.compile("[\d]{3}[\s\.]{1,4}[\d]{3}")
-        self.full_title_regex = re.compile("^[A-Z]+[A-Z \-\,]+\([a-zA-Z\s\-\.,;\&]+\)")
+        self.starts_with_title_regex = re.compile("^[A-Z]+[A-Z \-\,\.']+\([a-zA-Z\s\-\.,;\&]+\)")
+        self.full_title_regex = re.compile("[A-Z]+[A-Z \-\,\.]+\([a-zA-Z\s\-\.,;\&]+\)")
+        self.lone_title_regex = re.compile("[A-Z]+[A-Z \-\,\.]+")
         self.lone_industry_regex = re.compile("^\([a-zA-Z\s\-\.,;\&]+\)")
         self.industry_regex = re.compile("\([a-zA-Z\s\-\.,;\&]+\)")
         self.see_regex = re.compile("^see")
         self.see_under_regex = re.compile("(^see under|^see [A-Z]+[A-Z \-\,]+ under [A-Z]+[A-Z \-\,]+\([a-zA-Z\s\-\.,;\&]+\)+)")
         self.code_counter = {}
+        self.leading_period_regex = re.compile("^\.")
 
     def has_see(self, line):
         see_match = self.see_regex.search(line.lower())
@@ -33,8 +38,16 @@ class ParserHelper:
         code_match = self.code_regex.search(line)
         return code_match is not None
 
-    def has_full_title(self,line):
+    def starts_with_title(self,line):
+        title_match = self.starts_with_title_regex.search(line)
+        return title_match is not None
+
+    def has_full_title(self, line):
         title_match = self.full_title_regex.search(line)
+        return title_match is not None
+
+    def has_lone_title(self, line):
+        title_match = self.lone_title_regex.search(line)
         return title_match is not None
 
     def has_industry(self,line):
@@ -53,11 +66,21 @@ class ParserHelper:
         return code
 
     def get_title(self,line):
-        title_match = self.full_title_regex.search(line)
-        title = title_match.group(0)
-        title = re.sub(self.industry_regex,'',title)
-        title = title.rstrip()
-        return title
+        if self.has_lone_title(line):
+            title_match = self.lone_title_regex.search(line)
+            title = title_match.group(0)
+            title = title.rstrip()
+            return title
+        else:
+            return None
+
+    def get_full_title(self,line):
+        if self.has_full_title(line):
+            title = self.get_title(line)
+            industry = self.get_industry(line)
+            return(title + ' ' + industry)
+        else:
+            return None
 
     def get_industry(self, title):
         industry_match = self.industry_regex.search(title)
@@ -67,6 +90,7 @@ class ParserHelper:
 
     def remove_code(self,line):
         line = re.sub(self.code_regex,'',line)
+        line = re.sub(self.leading_period_regex,'',line)
         return line
 
 class AttributesParser65:
@@ -82,7 +106,7 @@ class AttributesParser65:
         self.definitions = {}
 
     def add_current_definition(self):
-        if self.ph.has_see(self.current_definition):
+        if self.ph.has_see_under(self.current_definition):
             self.title_searching = True
             self.current_definition = ''
         else:
@@ -98,7 +122,7 @@ class AttributesParser65:
     def parse(self,dot):
         for line in dot:
             if self.title_searching:
-                if self.ph.has_full_title(line):
+                if self.ph.starts_with_title(line):
                     if 'continued' in line.lower():
                         self.current_title = self.previous_title
                         self.current_industry = self.previous_industry
@@ -118,7 +142,7 @@ class AttributesParser65:
                     self.add_current_definition()
                     self.current_industry = self.ph.get_industry(line)
 
-                elif self.ph.has_full_title(line):
+                elif self.ph.starts_with_title(line):
                     self.add_current_definition()
                     self.current_title = self.ph.get_title(line)
                     self.current_industry = self.ph.get_industry(line)
@@ -134,6 +158,7 @@ class AttributesParser65:
         df = clean_column(df,'Industry','CleanedIndustry')
         df['FullTitle'] = df['CleanedTitle'] + ' ' + df['CleanedIndustry']
         df = df.drop_duplicates('FullTitle',keep=False)
+        # df['FullTitle'] = list(zip(df.CleanedTitle,df.CleanedIndustry))
         return df
 
 class AttributesParser91:
@@ -181,7 +206,9 @@ class AttributesParser91:
 
         df = pd.DataFrame(self.definitions)
         df.loc[:,'Definition'] = df['Definition'].str.strip()
-        return(pd.DataFrame(self.definitions))
+        df['DPT'] = df['Code'].str.slice(3,6).apply(harmonize_DPT)
+        df = df[['Title','Code','Definition','DPT','Industry','GED','EHFCoord','FingerDexterity','DCP','STS']]
+        return(df)
 
 ##### Data Loading Functions #####
 def load_metadata():
@@ -190,7 +217,9 @@ def load_metadata():
     md = clean_column(md,'Industry','CleanedIndustry')
     md['FullTitle'] = md['CleanedTitle'] + ' ' + md['CleanedIndustry']
     md = md.drop_duplicates()
+    # md = md.drop_duplicates('FullTitle')
     md = md.drop_duplicates('FullTitle',keep=False)
+    # md['FullTitle'] = list(zip(md.CleanedTitle,md.CleanedIndustry))
     return(md)
 
 def load_91_dot():
@@ -220,16 +249,20 @@ def remove_extra_spaces(title):
 
 ##### Data Creation functions #####
 def make_1965_data():
-    dot_text = load_dot()
+    dot_text = load_65_dot()
     md = load_metadata()
     parser = AttributesParser65()
     df = parser.parse(dot_text)
     md = md.merge(df[['FullTitle','Definition']],on='FullTitle',how='left')
     md = fuzzy_match(md,df)
-    md.loc[md.FuzzyScore >= 0.95,'Definition'] = md.loc[md.FuzzyScore >= 0.95,'FuzzyDefinition']
+    md.loc[md.FuzzyScore >= 0.91,'Definition'] = md.loc[md.FuzzyScore >= 0.91,'FuzzyDefinition']
+    md = match_see_defs(md)
     md = md.loc[md.Definition.notna()]
     md = add_outcomes(md)
-    md = md[['Code','Title','Industry','Definition','GED','EHFCoord','FingerDexterity','DCP','STS']]
+    md['DPT'] = md['Code'].astype(str).str.slice(-3)
+    md.loc[md.DPT.str.contains('\.'),'DPT'] = md.loc[md.DPT.str.contains('\.'),'DPT'].str.slice(1) + '0'
+    md['DPT'] = md['DPT'].apply(harmonize_DPT)
+    md = md[['Title','Code','Definition','DPT','Industry','GED','EHFCoord','FingerDexterity','DCP','STS']]
     return(md)
 
 def make_1991_data():
@@ -256,10 +289,28 @@ def find_fuzzy_match(title,title_list):
     match_title = title_list.loc[max_index]
     return(match_title, max_similarity)
 
+def match_see_defs(md):
+    ph = ParserHelper()
+    md['SeeDefinition'] = md['Definition'].apply(str).apply(ph.has_see)
+    md.loc[md.SeeDefinition,'SeeFullTitle'] = md.loc[md.SeeDefinition, 'Definition'].apply(str).apply(ph.get_full_title)
+    md.loc[md.SeeDefinition,'SeeLoneTitle'] = md.loc[md.SeeDefinition, 'Definition'].apply(str).apply(ph.get_title)
+    md = clean_column(md,'SeeFullTitle','SeeFullTitle')
+    md = clean_column(md,'SeeLoneTitle','SeeLoneTitle')
+    md_copy = md.copy()
+    for idx, row in md_copy.loc[md_copy.SeeDefinition,:].iterrows():
+        if row.SeeFullTitle != 'None':
+            definition = md.loc[md.FullTitle == row.SeeFullTitle,'Definition']
+        else:
+             definition = md.loc[md.CleanedTitle == row.SeeLoneTitle,'Definition']
+
+        if not definition.empty:
+            md.loc[idx,'Definition'] = definition.to_numpy()[0]
+    return md
+
 def compute_midpoint(code):
     code = re.sub(' ','',code)
     codes = [int(subcode) for subcode in code]
-    return np.mean(codes)
+    return np.median(codes)
 
 def add_outcomes(md):
     md['GED'] = md['GED'].apply(str).apply(compute_midpoint)
@@ -267,27 +318,23 @@ def add_outcomes(md):
     md['FingerDexterity'] = md['F'].apply(str).apply(compute_midpoint)
     md['DCP'] = md['Temp'].str.contains('4')
     md['STS'] = md['Temp'].str.contains('Y')
+    md = md.replace({True: 1, False: 0})
     return(md)
 
-##### Data Saving Functions #####
-def save_data(df,year):
-    train, val, test = train_val_test_split(df)
-    write_set(train,year,'train')
-    write_set(val,year,'dev')
-    write_set(test,year,'test')
-
-def train_val_test_split(df,train_size=0.6,val_size=0.2,test_size=0.2):
-    train_idx = int(train_size*len(df))
-    val_idx = int((train_size+val_size)*len(df))
-    train, val, test = np.split(df.sample(frac=1), [train_idx, val_idx],random_state=RANDOM_STATE)
-    return(train, val, test)
-
-def write_set(df,year,set_type):
-    outfile = os.path.join(DATA_DIR,'attributes',year,set_type)+'.csv'
-    df.to_csv(outfile,index=False)
+def harmonize_DPT(code):
+    data = int(code[0])
+    people = int(code[1])
+    things = int(code[2])
+    data = 6 if data > 6 else data
+    things = 7 if things > 7 else things
+    dpt = str(data)+str(people)+str(things)
+    return dpt
 
 def main():
     dot_1965 = make_1965_data()
-    save_data(dot_1965,'1965')
+    du.save_data(dot_1965,'Attr','1965')
+    du.save_data(dot_1965,'DPT','1965')
     dot_1991 = make_1991_data()
-    save_data(dot_1991,'1991')
+    du.save_data(dot_1991,'Attr','1991')
+
+main()
