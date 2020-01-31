@@ -196,9 +196,9 @@ class AttributesParser91:
             entry['Industry'] = industry
             entry['Code'] = dot_code
             entry['Definition'] = definition
-            entry['GED'] = ged_math
-            entry['EHFCoord'] = eye_hand
-            entry['FingerDexterity'] = finger_dext
+            entry['GED'] = max([float(ged_math),1.5])
+            entry['EHFCoord'] = float(eye_hand) if float(eye_hand) != 2.0 else 2.5
+            entry['FingerDexterity'] = max([float(finger_dext),1.5]) if float(finger_dext) < 5 else 4.5
             entry['DCP'] = 1 if 'D' in temp else 0
             entry['STS'] = 1 if 'T' in temp else 0
             entry['DLU'] = update_date
@@ -207,7 +207,10 @@ class AttributesParser91:
         df = pd.DataFrame(self.definitions)
         df.loc[:,'Definition'] = df['Definition'].str.strip()
         df['DPT'] = df['Code'].str.slice(3,6).apply(harmonize_DPT)
-        df = df[['Title','Code','Definition','DPT','Industry','GED','EHFCoord','FingerDexterity','DCP','STS']]
+        df['Attr'] = list(zip(df.GED.astype(str),df.EHFCoord.astype(str),
+                              df.FingerDexterity.astype(str),df.DCP.astype(str),
+                              df.STS.astype(str)))
+        df = df[['Title','Code','Definition','DPT','Industry','GED','EHFCoord','FingerDexterity','DCP','STS','Attr']]
         return(df)
 
 ##### Data Loading Functions #####
@@ -229,7 +232,8 @@ def load_91_dot():
     return(lines)
 
 def load_65_dot():
-    with open('/Users/joseivelarde/dot-nlp/data/raw/1965_Output.txt','r',errors='ignore') as f:
+    filepath = os.path.join(DATA_DIR,'raw','1965_Output.txt')
+    with open(filepath,'r',errors='ignore') as f:
         lines = f.readlines()
     dot = [line.rstrip() for line in lines]
     dot = [remove_extra_spaces(line) for line in dot]
@@ -257,12 +261,16 @@ def make_1965_data():
     md = fuzzy_match(md,df)
     md.loc[md.FuzzyScore >= 0.91,'Definition'] = md.loc[md.FuzzyScore >= 0.91,'FuzzyDefinition']
     md = match_see_defs(md)
-    md = md.loc[md.Definition.notna()]
+    md = md.loc[md.Definition.notna(),:]
+    md = md.loc[md.Definition != '',:]
     md = add_outcomes(md)
     md['DPT'] = md['Code'].astype(str).str.slice(-3)
     md.loc[md.DPT.str.contains('\.'),'DPT'] = md.loc[md.DPT.str.contains('\.'),'DPT'].str.slice(1) + '0'
     md['DPT'] = md['DPT'].apply(harmonize_DPT)
-    md = md[['Title','Code','Definition','DPT','Industry','GED','EHFCoord','FingerDexterity','DCP','STS']]
+    md['Attr'] = list(zip(md.GED.astype(str),md.EHFCoord.astype(str),
+                          md.FingerDexterity.astype(str),md.DCP.astype(str),
+                          md.STS.astype(str)))
+    md = md[['Title','Code','Definition','DPT','Industry','GED','EHFCoord','FingerDexterity','DCP','STS','Attr']]
     return(md)
 
 def make_1991_data():
@@ -316,8 +324,8 @@ def add_outcomes(md):
     md['GED'] = md['GED'].apply(str).apply(compute_midpoint)
     md['EHFCoord'] = md['E'].apply(str).apply(compute_midpoint)
     md['FingerDexterity'] = md['F'].apply(str).apply(compute_midpoint)
-    md['DCP'] = md['Temp'].str.contains('4')
-    md['STS'] = md['Temp'].str.contains('Y')
+    md['DCP'] = md['Temp'].astype(str).str.contains('4')
+    md['STS'] = md['Temp'].astype(str).str.contains('Y',case=False)
     md = md.replace({True: 1, False: 0})
     return(md)
 
@@ -331,10 +339,12 @@ def harmonize_DPT(code):
     return dpt
 
 def main():
-    dot_1965 = make_1965_data()
-    du.save_data(dot_1965,'Attr','1965')
-    du.save_data(dot_1965,'DPT','1965')
+    # dot_1965 = make_1965_data()
+    # dot_1965.to_csv(os.path.join(DATA_DIR,'Attr','1965','full_data.csv'),index=False)
+    # du.save_data(dot_1965,'Attr','1965')
+    # du.save_data(dot_1965,'DPT','1965')
     dot_1991 = make_1991_data()
+    dot_1991.to_csv(os.path.join(DATA_DIR,'Attr','1991','full_data.csv'),index=False)
     du.save_data(dot_1991,'Attr','1991')
 
 main()

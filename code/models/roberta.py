@@ -7,6 +7,9 @@ import argparse
 import glob
 import os
 import random
+import sys
+import math
+import pandas as pd
 
 import numpy as np
 import torch
@@ -16,23 +19,8 @@ from torch.utils.data.distributed import DistributedSampler
 
 from tqdm import tqdm, trange
 
-from transformers import (WEIGHTS_NAME,RobertaConfig,
-  RobertaForSequenceClassification, RobertaTokenizer)
-
-from transformers import AdamW, WarmupLinearSchedule
-
-ALL_MODELS = sum((tuple(conf.pretrained_config_archive_map.keys()) for conf in (RobertaConfig)), ())
-
-MODEL_CLASSES = {
-    'roberta': (RobertaConfig, RobertaForSequenceClassification, RobertaTokenizer)
-}
-
-PROCESSORS = {'DPT' : rfb.DPTProcessor, 'Attr' : rfb.AttributesProcessor}
-TASK_YEARS: = {'DPT': ['1965','1977'],'Attr':['1965','1991']}
-
-# TODO:
-# Write Attr eval function
-# Figure out where to harmonize DPT codes.
+from transformers import (WEIGHTS_NAME,AdamW,RobertaConfig,
+  RobertaForSequenceClassification, RobertaTokenizer,get_linear_schedule_with_warmup)
 
 from dotenv import load_dotenv, find_dotenv
 dotenv_path = find_dotenv()
@@ -45,6 +33,15 @@ import roberta_feature_builder as rfb
 import eval_utils as eu
 import utils
 
+MODEL_CLASSES = {
+    'roberta': (RobertaConfig, RobertaForSequenceClassification, RobertaTokenizer)
+}
+
+PROCESSORS = {'DPT' : rfb.DPTProcessor, 'Attr' : rfb.AttributesProcessor}
+TASK_YEARS = {'DPT': ['1965','1977'],'Attr':['1965','1991']}
+
+
+
 def set_seed(args):
     random.seed(args.seed)
     np.random.seed(args.seed)
@@ -52,15 +49,13 @@ def set_seed(args):
 
 def load_examples(args, processor, tokenizer, year,type='train'):
     output_mode = 'classification'
-    data_dir = os.path.join(PROJECT_DIR,'data',args.task,year)
+    data_dir = os.path.join(PROJECT_DIR,'data',args.task_name,year)
     # Load data features from cache or dataset file
 
     label_list = processor.get_labels()
 
     examples = processor.get_examples(data_dir,type)
-    features = processor.convert_examples_to_features(examples,
-                                            tokenizer=tokenizer,
-                                            max_length=args.max_seq_length)
+    features = processor.convert_examples_to_features(examples,tokenizer,max_length=args.max_seq_length)
 
     # Convert to Tensors and build dataset
     all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
@@ -75,25 +70,23 @@ def load_examples(args, processor, tokenizer, year,type='train'):
     return dataset
 
 def train_model(args):
-    parser = utils.model_options_parser()
-    args = parser.parse_args()
     model_dir = os.path.join(PROJECT_DIR,"models",args.task_name,args.identifier)
     # Set seed
     set_seed(args)
 
     # Prepare GLUE task
-    processor = processors[args.task_name]()
+    processor = PROCESSORS[args.task_name]()
     label_list = processor.get_labels()
     num_labels = len(label_list)
 
     config_class, model_class, tokenizer_class = MODEL_CLASSES['roberta']
-    config = config_class.from_pretrained('roberta',
+    config = config_class.from_pretrained('roberta-base',
                                           num_labels=num_labels,
                                           cache_dir=None)
-    tokenizer = tokenizer_class.from_pretrained('roberta',
+    tokenizer = tokenizer_class.from_pretrained('roberta-base',
                                                 do_lower_case=args.do_lower_case,
                                                 cache_dir= None)
-    model = model_class.from_pretrained('roberta',
+    model = model_class.from_pretrained('roberta-base',
                                         config=config,
                                         cache_dir=None)
 
@@ -114,7 +107,10 @@ def train(args, train_dataset, model, tokenizer):
     results_dir = os.path.join(PROJECT_DIR,"results",args.task_name)
     output_dir = os.path.join(PROJECT_DIR,"output",args.task_name)
 
-    torch.save(args, os.path.join(output_dir, 'training_args.bin'))
+    if not os.path.exists(model_dir):
+        os.makedirs(model_dir)
+
+    torch.save(args, os.path.join(model_dir, 'training_args.bin'))
 
     epochs_no_improve = 0
     train_sampler = RandomSampler(train_dataset)
@@ -129,7 +125,7 @@ def train(args, train_dataset, model, tokenizer):
         {'params': [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
         ]
     optimizer = AdamW(optimizer_grouped_parameters, lr=5e-5, eps=1e-8)
-    scheduler = WarmupLinearSchedule(optimizer, warmup_steps=0, t_total=t_total)
+    scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=t_total)
 
     # Train!
 
@@ -170,8 +166,6 @@ def train(args, train_dataset, model, tokenizer):
             eval_loss = get_eval_loss(args, model, tokenizer)
             if eval_loss < min_eval_loss:
                 # Save model checkpoint
-                if not os.path.exists(model_dir):
-                    os.makedirs(model_dir)
                 model_to_save = model.module if hasattr(model, 'module') else model  # Take care of distributed/parallel training
                 model_to_save.save_pretrained(model_dir)
                 tokenizer.save_pretrained(model_dir)
@@ -186,11 +180,8 @@ def train(args, train_dataset, model, tokenizer):
 
 def get_eval_loss(args, model, tokenizer):
     eval_task = args.task_name
-    processor = processors[args.task_name]()
-    eval_dataset = load_examples(args, processor, tokenizer, type='val')
-
-    if not os.path.exists(eval_output_dir):
-        os.makedirs(eval_output_dir)
+    processor = PROCESSORS[args.task_name]()
+    eval_dataset = load_examples(args, processor, tokenizer, args.eval_year,type='dev')
 
     # Note that DistributedSampler samples randomly
     eval_sampler = SequentialSampler(eval_dataset)
@@ -231,19 +222,20 @@ def get_eval_loss(args, model, tokenizer):
 def evaluate_model(args):
     model_dir = os.path.join(PROJECT_DIR,"models",args.task_name,args.identifier)
 
-    tokenizer = tokenizer_class.from_pretrained(model_dir, do_lower_case=args.do_lower_case)
-    model = model_class.from_pretrained(model_dir)
+    tokenizer = RobertaTokenizer.from_pretrained(model_dir, do_lower_case=args.do_lower_case)
+    model = RobertaForSequenceClassification.from_pretrained(model_dir)
     model.to(args.device)
-    for year in TASK_YEARS[args.task]:
+    for year in TASK_YEARS[args.task_name]:
         evaluate(args, model, tokenizer,year,'test')
 
 def evaluate(args, model, tokenizer, eval_year, eval_type):
-    eval_results_dir = os.path.join(PROJECT_DIR,"results",args.task)
-    eval_output_dir = os.path.join(PROJECT_DIR,"output",args.task)
-    data_dir = os.path.join(PROJECT_DIR,'data',args.task, year)
+    eval_results_dir = os.path.join(PROJECT_DIR,"results",args.task_name)
+    eval_output_dir = os.path.join(PROJECT_DIR,"output",args.task_name)
+    data_dir = os.path.join(PROJECT_DIR,'data',args.task_name, eval_year)
 
     results = {}
-    eval_dataset = load_examples(args, processor, tokenizer, eval_year, type='eval')
+    processor = PROCESSORS[args.task_name]()
+    eval_dataset = load_examples(args, processor, tokenizer, eval_year, type=eval_type)
 
     if not os.path.exists(eval_results_dir):
         os.makedirs(eval_results_dir)
@@ -283,19 +275,23 @@ def evaluate(args, model, tokenizer, eval_year, eval_type):
     preds = np.argmax(preds, axis=1)
 
     df = pd.read_csv(data_dir+'/'+eval_type+ '.csv')
-    preds_name = 'pred_'+args.task
+    preds_name = 'pred_'+args.task_name
+    identifier = args.identifier
     df[preds_name] = preds
-    df = df[['Title','Code',preds_name,args.task]]
-    labels = df[args.task].apply(str)
+    label_list = processor.get_labels()
+    label_map = {i: label for i, label in enumerate(label_list)}
+    df[preds_name] = df[preds_name].apply(lambda x: label_map[x])
+    df = df[['Title','Code',preds_name,args.task_name]]
+    labels = df[args.task_name]
     df.to_csv(os.path.join(eval_output_dir,identifier+'_'+eval_year+'_'+eval_type+'_preds.csv'),index=False)
-    result = eu.evaluate_predictions(df[preds_name],labels,args.task)
-    output_eval_file = os.path.join(results_dir,identifier+'_' + eval_year + "_"+eval_type +"_results.txt")
+    result = eu.evaluate_predictions(df[preds_name],labels,'Attr')
+    output_eval_file = os.path.join(eval_results_dir,args.identifier+'_' + eval_year + "_"+eval_type +"_results.txt")
 
     with open(output_eval_file, "w") as writer:
         for key in sorted(result.keys()):
             writer.write("%s = %s\n" % (key, str(result[key])))
 
-    print(results)
+    print(result)
 
 def main():
     parser = utils.roberta_parser()
@@ -305,3 +301,5 @@ def main():
 
     if args.do_eval:
         evaluate_model(args)
+
+main()

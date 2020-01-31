@@ -2,6 +2,8 @@ import csv
 import copy
 import json
 import os
+import numpy as np
+import pandas as pd
 
 class InputExample(object):
     """
@@ -206,12 +208,12 @@ class AttributesProcessor(DataProcessor):
 
     def get_labels(self):
         GED = np.arange(1.5,6.5,0.5)
-        finger_dext = np.arange(1.5,5,0.5)
         coord = [1.0,2.5,3.0,3.5,4.0,4.5,5.0]
+        finger_dext = np.arange(1.5,5,0.5)
         sts = [0,1]
         dcp = [0,1]
-        labels = [(str(G),str(f),str(c),str(s),str(d))
-        for G in GED for f in finger_dext for c in coord for s in sts for d in dcp]
+        labels = [(str(G),str(c),str(f),str(s),str(d))
+        for G in GED for c in coord for f in finger_dext for s in sts for d in dcp]
         return labels
 
     def read_csv(self,input_file):
@@ -230,7 +232,7 @@ class AttributesProcessor(DataProcessor):
             examples.append(InputExample(guid=guid, text_a=text_a, label=label))
         return examples
 
-    def convert_examples_to_features(examples, tokenizer,
+    def convert_examples_to_features(self,examples, tokenizer,
                                           max_length=190,
                                           pad_on_left=False,
                                           pad_token=0,
@@ -259,7 +261,6 @@ class AttributesProcessor(DataProcessor):
 
         features = []
         for (ex_index, example) in enumerate(examples):
-
             inputs = tokenizer.encode_plus(
                 example.text_a,
                 example.text_b,

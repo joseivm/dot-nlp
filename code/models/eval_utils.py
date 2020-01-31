@@ -1,4 +1,5 @@
 from scipy.stats import spearmanr, pearsonr
+import ast
 
 def evaluate_predictions(preds,labels,task):
     if task == 'DPT':
@@ -27,10 +28,11 @@ def evaluate_dpt_predictions(preds,labels):
 def evaluate_attr_predictions(preds,labels):
     code_to_idx = {'GED':0,'EHFCoord':1,'FingerDexterity':2,'DCP':3,'STS':4}
     results = {}
-    str_preds = preds.astype(str)
-    results['Overall accuracy'] = (labels == str_preds).mean()
+    # preds = preds.apply(lambda x: ast.literal_eval(x))
+    labels = labels.apply(lambda x: ast.literal_eval(x))
+    results['Overall accuracy'] = (labels == preds).mean()
     for code, idx in code_to_idx.items():
-        code_preds = str_preds.apply(lambda x: x[idx]).astype(float)
+        code_preds = preds.apply(lambda x: x[idx]).astype(float)
         code_labels = labels.apply(lambda x: x[idx]).astype(float)
         code_accuracy = (code_preds == code_labels).mean()
         code_dist = (code_preds - code_labels).abs().mean()
