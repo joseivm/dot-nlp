@@ -169,6 +169,7 @@ def train(args, train_dataset, model, tokenizer):
                 model_to_save = model.module if hasattr(model, 'module') else model  # Take care of distributed/parallel training
                 model_to_save.save_pretrained(model_dir)
                 tokenizer.save_pretrained(model_dir)
+                min_eval_loss = eval_loss
                 epochs_no_improve = 0
             else:
                 epochs_no_improve += 1
@@ -284,7 +285,7 @@ def evaluate(args, model, tokenizer, eval_year, eval_type):
     df = df[['Title','Code',preds_name,args.task_name]]
     labels = df[args.task_name]
     df.to_csv(os.path.join(eval_output_dir,identifier+'_'+eval_year+'_'+eval_type+'_preds.csv'),index=False)
-    result = eu.evaluate_predictions(df[preds_name],labels,'Attr')
+    result = eu.evaluate_predictions(df[preds_name],labels,args.task_name)
     output_eval_file = os.path.join(eval_results_dir,args.identifier+'_' + eval_year + "_"+eval_type +"_results.txt")
 
     with open(output_eval_file, "w") as writer:

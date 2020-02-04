@@ -126,12 +126,12 @@ class DPTProcessor(DataProcessor):
         for (i, line) in enumerate(lines):
             guid = "%s-%s" % (set_type, i)
             text_a = line[2]
-            label = line[3]
+            label = line[3][1:]
             # label = int(label)
             examples.append(InputExample(guid=guid, text_a=text_a, label=label))
         return examples
 
-    def convert_examples_to_features(examples, tokenizer,
+    def convert_examples_to_features(self,examples, tokenizer,
                                           max_length=190,
                                           pad_on_left=False,
                                           pad_token=0,

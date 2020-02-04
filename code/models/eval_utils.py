@@ -11,6 +11,7 @@ def evaluate_dpt_predictions(preds,labels):
     code_to_idx = {'data':0,'people':1,'things':2}
     results = {}
     str_preds = preds.astype(str).apply(to_three_digit)
+    labels = labels.str.slice(start=1)
     results['Overall accuracy'] = (labels == str_preds).mean()
     for code, idx in code_to_idx.items():
         code_preds = str_preds.str.slice(start=idx,stop=idx+1).astype(int)
