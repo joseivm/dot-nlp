@@ -1,0 +1,13 @@
+Overall accuracy = 0.5873015873015873
+data accuracy = 0.8007518796992481
+data correlation = 0.8925671928635954
+data mean distance = 0.38721804511278196
+data rank correlation = 0.8859357318869324
+people accuracy = 0.8646616541353384
+people correlation = 0.8531246680503248
+people mean distance = 0.32456140350877194
+people rank correlation = 0.836317667776082
+things accuracy = 0.8116123642439432
+things correlation = 0.7911660434218496
+things mean distance = 0.5818713450292398
+things rank correlation = 0.7769147313207677

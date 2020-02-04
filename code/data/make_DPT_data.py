@@ -67,6 +67,7 @@ class DPTParser77:
         df['Title'] = df['TitleDefinition'].apply(lambda x: x[0])
         df['Definition'] = df['TitleDefinition'].apply(lambda x: x[1])
         df['DPT'] = df['Code'].apply(get_DPT)
+        df = df.loc[df.Definition != '',:]
         return df[['Title','Code','Definition','DPT']]
 
 class DPTParser65:
@@ -157,7 +158,7 @@ def get_DPT(code):
     things = int(code[6])
     data = 6 if data > 6 else data
     things = 7 if things > 7 else things
-    dpt = str(data)+str(people)+str(things)
+    dpt = 'D'+str(data)+str(people)+str(things)
     return dpt
 
 def main():

@@ -334,15 +334,16 @@ def harmonize_DPT(code):
     people = int(code[1])
     things = int(code[2])
     data = 6 if data > 6 else data
+    people = 8 if people > 8 else people
     things = 7 if things > 7 else things
-    dpt = str(data)+str(people)+str(things)
+    dpt = 'D'+str(data)+str(people)+str(things)
     return dpt
 
 def main():
-    # dot_1965 = make_1965_data()
-    # dot_1965.to_csv(os.path.join(DATA_DIR,'Attr','1965','full_data.csv'),index=False)
-    # du.save_data(dot_1965,'Attr','1965')
-    # du.save_data(dot_1965,'DPT','1965')
+    dot_1965 = make_1965_data()
+    dot_1965.to_csv(os.path.join(DATA_DIR,'Attr','1965','full_data.csv'),index=False)
+    du.save_data(dot_1965,'Attr','1965')
+    du.save_data(dot_1965,'DPT','1965')
     dot_1991 = make_1991_data()
     dot_1991.to_csv(os.path.join(DATA_DIR,'Attr','1991','full_data.csv'),index=False)
     du.save_data(dot_1991,'Attr','1991')
