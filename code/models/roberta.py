@@ -102,7 +102,6 @@ def train_model(args):
 def train(args, train_dataset, model, tokenizer):
     """ Train the model """
     train_data_dir = os.path.join(PROJECT_DIR,"data",args.task_name,args.train_year)
-    eval_data_dir = os.path.join(PROJECT_DIR,"data",args.task_name,args.eval_year)
     model_dir = os.path.join(PROJECT_DIR,"models",args.task_name,args.identifier)
     results_dir = os.path.join(PROJECT_DIR,"results",args.task_name)
     output_dir = os.path.join(PROJECT_DIR,"output",args.task_name)
@@ -182,7 +181,7 @@ def train(args, train_dataset, model, tokenizer):
 def get_eval_loss(args, model, tokenizer):
     eval_task = args.task_name
     processor = PROCESSORS[args.task_name]()
-    eval_dataset = load_examples(args, processor, tokenizer, args.eval_year,type='dev')
+    eval_dataset = load_examples(args, processor, tokenizer, args.train_year,type='dev')
 
     # Note that DistributedSampler samples randomly
     eval_sampler = SequentialSampler(eval_dataset)
@@ -286,21 +285,18 @@ def evaluate(args, model, tokenizer, eval_year, eval_type):
     labels = df[args.task_name]
     df.to_csv(os.path.join(eval_output_dir,identifier+'_'+eval_year+'_'+eval_type+'_preds.csv'),index=False)
     result = eu.evaluate_predictions(df[preds_name],labels,args.task_name)
-    output_eval_file = os.path.join(eval_results_dir,args.identifier+'_' + eval_year + "_"+eval_type +"_results.txt")
-
-    with open(output_eval_file, "w") as writer:
-        for key in sorted(result.keys()):
-            writer.write("%s = %s\n" % (key, str(result[key])))
+    output_eval_file = os.path.join(eval_results_dir,args.identifier+'_' + eval_year + "_"+eval_type +"_results.csv")
+    result.to_csv(output_eval_file)
 
     print(result)
 
 def main():
     parser = utils.roberta_parser()
     args = parser.parse_args()
-    if args.do_train:
+    if not args.no_train:
         train_model(args)
 
-    if args.do_eval:
+    if not args.no_eval:
         evaluate_model(args)
 
 main()

@@ -9,7 +9,7 @@ def evaluate_predictions(preds,labels,task):
 
 def evaluate_dpt_predictions(preds,labels):
     code_to_idx = {'data':0,'people':1,'things':2}
-    results = {}
+    results = []
     str_preds = preds.astype(str).apply(to_three_digit)
     labels = labels.str.slice(start=1)
     results['Overall accuracy'] = (labels == str_preds).mean()
@@ -20,15 +20,14 @@ def evaluate_dpt_predictions(preds,labels):
         code_dist = (code_preds - code_labels).abs().mean()
         code_corr = pearsonr(code_preds,code_labels)[0]
         code_rank_corr = spearmanr(code_preds,code_labels)[0]
-        results[code +' accuracy'] = code_accuracy
-        results[code + ' mean distance'] = code_dist
-        results[code + ' correlation'] = code_corr
-        results[code + ' rank correlation'] = code_rank_corr
-    return results
+        results.append({'Attribute':code,'Accuracy':code_accuracy,
+                        'Correlation':code_corr,'Rank Correlation':code_rank_corr})
+
+    return pd.DataFrame(results)
 
 def evaluate_attr_predictions(preds,labels):
     code_to_idx = {'GED':0,'EHFCoord':1,'FingerDexterity':2,'DCP':3,'STS':4}
-    results = {}
+    results = []
     # preds = preds.apply(lambda x: ast.literal_eval(x))
     labels = labels.apply(lambda x: ast.literal_eval(x))
     results['Overall accuracy'] = (labels == preds).mean()
@@ -39,11 +38,9 @@ def evaluate_attr_predictions(preds,labels):
         code_dist = (code_preds - code_labels).abs().mean()
         code_corr = pearsonr(code_preds,code_labels)[0]
         code_rank_corr = spearmanr(code_preds,code_labels)[0]
-        results[code +' accuracy'] = code_accuracy
-        results[code + ' mean distance'] = code_dist
-        results[code + ' correlation'] = code_corr
-        results[code + ' rank correlation'] = code_rank_corr
-    return results
+        results.append({'Attribute':code,'Accuracy':code_accuracy,
+                        'Correlation':code_corr,'Rank Correlation':code_rank_corr})
+    return pd.DataFrame(results)
 
 def to_three_digit(code):
     if len(code) == 1:

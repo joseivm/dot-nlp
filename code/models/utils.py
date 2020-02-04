@@ -89,20 +89,16 @@ def roberta_parser():
                         type=int,
                         help="The maximum total input sequence length after tokenization. Sequences longer "
                              "than this will be truncated, sequences shorter will be padded.")
-    parser.add_argument("--do_train",
-                        action='store_true',
+    parser.add_argument("--no_train",
+                        action='store_false',
                         help="Whether to run training.")
-    parser.add_argument("--do_eval",
-                        action='store_true',
+    parser.add_argument("--no_eval",
+                        action='store_false',
                         help="Whether to run eval on the dev set.")
     parser.add_argument("--train_year",
                         default='1977',
                         type=str,
                         help="What year to use for training data")
-    parser.add_argument("--eval_year",
-                        default='1977',
-                        type=str,
-                        help="What year to use for validation data")
     parser.add_argument("--do_lower_case",
                         action='store_true',
                         help="Set this flag if you are using an uncased model.")
@@ -118,7 +114,7 @@ def roberta_parser():
                         default=1,
                         help="Number of updates steps to accumulate before performing a backward/update pass.")
     parser.add_argument("--num_train_epochs",
-                        default=3.0,
+                        default=10.0,
                         type=float,
                         help="Total number of training epochs to perform.")
     parser.add_argument("--patience",
