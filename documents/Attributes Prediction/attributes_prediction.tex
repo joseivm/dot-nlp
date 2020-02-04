@@ -1,0 +1,56 @@
+\documentclass[11pt]{article}
+
+\title{DOT Attributes Prediction}
+
+\begin{document}
+\maketitle
+
+This document describes the performance of our predictive model on the task of predicting the following job attributes for jobs in the 1965 and 1991 DOT.
+
+\begin{itemize}
+  \item \textbf{GED Math} general ability to learn, reason, and make judgements
+  \item \textbf{Eye-Hand-Foot Coordination} motor responsiveness to visual stimuli
+  \item \textbf{Finger Dexterity} ability to finger and manipulate small objects
+  \item \textbf{Direction, Control, Planning} directing, controlling or planning activities of others
+  \item \textbf{Set limits, tolerances, and standards} attaining precise et limits, tolerances, and standards
+\end{itemize}
+
+Note: the GED Math labels are different in 1965 and 1991. Mainly, the 1965 data contains "half points", (e.g. 4.5, 5.5, etc) whereas the 1991 data contains only integers. This accounts for the low accuracy but high correlation on that specific task.  
+
+\begin{table}[h!]
+  \caption{Performance on 1965 Data}
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\textbf{Model} & \textbf{Attribute}                    & \textbf{Accuracy} & \textbf{Correlation} & \textbf{Rank Correlation} \\ \hline
+1965           & GED Math                              & 75\%              & .90                  & .88                       \\ \hline
+1965           & Eye-Hand-Foot Coordination            & 85\%              & .62                  & .66                       \\ \hline
+1965           & Finger Dexterity                      & 88\%              & .74                  & .73                       \\ \hline
+1965           & Direction, Control, Planning          & 98\%              & .92                  & .92                       \\ \hline
+1965           & Set limits, tolerances, and standards & 88\%              & .74                  & .74                       \\ \hline
+1991           & GED Math                              & 22\%              & .79                  & .81                       \\ \hline
+1991           & Eye-Hand-Foot Coordination            & 23\%              & .20                  & .16                       \\ \hline
+1991           & Finger Dexterity                      & 11\%              & .42                  & .40                       \\ \hline
+1991           & Direction, Control, Planning          & 96\%              & .84                  & .84                       \\ \hline
+1991           & Set limits, tolerances, and standards & 81\%              & .59                  & .59                       \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+  \caption{Performance on 1991 Data}
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\textbf{Model} & \textbf{Attribute}                    & \textbf{Accuracy} & \textbf{Correlation} & \textbf{Rank Correlation} \\ \hline
+1965           & GED Math                              & 20\%              & .78                  & .79                       \\ \hline
+1965           & Eye-Hand-Foot Coordination            & 23\%              & .20                  & .17                       \\ \hline
+1965           & Finger Dexterity                      & 12\%              & .42                  & .39                       \\ \hline
+1965           & Direction, Control, Planning          & 96\%              & .87                  & .87                       \\ \hline
+1965           & Set limits, tolerances, and standards & 75\%              & .49                  & .49                       \\ \hline
+1991           & GED Math                              & 68\%              & .85                  & .84                       \\ \hline
+1991           & Eye-Hand-Foot Coordination            & 78\%              & .5                   & .47                       \\ \hline
+1991           & Finger Dexterity                      & 72\%              & .57                  & .55                       \\ \hline
+1991           & Direction, Control, Planning          & 97\%              & .90                  & .90                       \\ \hline
+1991           & Set limits, tolerances, and standards & 77\%              & .54                  & .54                       \\ \hline
+\end{tabular}
+\end{table}
+
+\end{document}
