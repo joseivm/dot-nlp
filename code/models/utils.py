@@ -90,10 +90,10 @@ def roberta_parser():
                         help="The maximum total input sequence length after tokenization. Sequences longer "
                              "than this will be truncated, sequences shorter will be padded.")
     parser.add_argument("--no_train",
-                        action='store_false',
+                        action='store_true',
                         help="Whether to run training.")
     parser.add_argument("--no_eval",
-                        action='store_false',
+                        action='store_true',
                         help="Whether to run eval on the dev set.")
     parser.add_argument("--train_year",
                         default='1977',
