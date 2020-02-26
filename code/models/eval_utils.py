@@ -1,5 +1,6 @@
 from scipy.stats import spearmanr, pearsonr
 import ast
+import pandas as pd
 
 HML_dict = {'FingerDexterity':[3,3.5],'EHFCoord':[4,5]}
 
@@ -32,7 +33,7 @@ def evaluate_attr_predictions(preds,labels):
     results = []
     # preds = preds.apply(lambda x: ast.literal_eval(x))
     labels = labels.apply(lambda x: ast.literal_eval(x))
-    results['Overall accuracy'] = (labels == preds).mean()
+    # results['Overall accuracy'] = (labels == preds).mean()
     for code, idx in code_to_idx.items():
         code_preds = preds.apply(lambda x: x[idx]).astype(float)
         code_labels = labels.apply(lambda x: x[idx]).astype(float)
