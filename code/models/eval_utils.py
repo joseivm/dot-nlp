@@ -1,6 +1,8 @@
 from scipy.stats import spearmanr, pearsonr
 import ast
 
+HML_dict = {'FingerDexterity':[3,3.5],'EHFCoord':[4,5]}
+
 def evaluate_predictions(preds,labels,task):
     if task == 'DPT':
         return evaluate_dpt_predictions(preds,labels)
@@ -38,7 +40,23 @@ def evaluate_attr_predictions(preds,labels):
         code_dist = (code_preds - code_labels).abs().mean()
         code_corr = pearsonr(code_preds,code_labels)[0]
         code_rank_corr = spearmanr(code_preds,code_labels)[0]
-        results.append({'Attribute':code,'Accuracy':code_accuracy,
+        if code in HML_dict.keys():
+            quantiles = HML_dict[code]
+            pred_low = code_preds.apply(lambda x: x < quantiles[0])
+            pred_medium = code_preds.apply(lambda x: x >= quantiles[0] and x < quantiles[1])
+            pred_high = code_preds.apply(lambda x: x >= quantiles[1])
+            pred_hml = code_low + code_medium + code_high
+
+            label_low = code_labels.apply(lambda x: x < quantiles[0])
+            label_medium = code_labels.apply(lambda x: x >= quantiles[0] and x < quantiles[1])
+            label_high = code_labels.apply(lambda x: x >= quantiles[1])
+            label_hml = label_low + label_medium + label_high
+
+            hml_accuracy = (pred_hml == label_hml).mean()
+            results.append({'Attribute':code,'Accuracy':code_accuracy,'HML Accuracy':hml_accuracy,
+                            'Correlation':code_corr,'Rank Correlation':code_rank_corr})
+        else:
+            results.append({'Attribute':code,'Accuracy':code_accuracy,'HML Accuracy':0,
                         'Correlation':code_corr,'Rank Correlation':code_rank_corr})
     return pd.DataFrame(results)
 

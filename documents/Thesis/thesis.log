@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.4.16)  11 FEB 2020 13:21
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.4.16)  25 FEB 2020 14:38
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -250,20 +250,40 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 
  [1
 
-{/usr/local/texlive/2018/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] (./thesis.aux) ) 
+{/usr/local/texlive/2018/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+<images/dot_def.png, id=11, 366.36874pt x 208.78pt>
+File: images/dot_def.png Graphic file (type png)
+<use images/dot_def.png>
+Package pdftex.def Info: images/dot_def.png  used on input line 29.
+(pdftex.def)             Requested size: 281.85587pt x 160.62727pt.
+<images/DPT.png, id=13, 832.10875pt x 219.82124pt>
+File: images/DPT.png Graphic file (type png)
+<use images/DPT.png>
+Package pdftex.def Info: images/DPT.png  used on input line 40.
+(pdftex.def)             Requested size: 446.26582pt x 117.89333pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[2 <./images/dot_def.png>]
+Overfull \hbox (58.1133pt too wide) in paragraph at lines 48--57
+ [][] 
+ []
+
+[3 <./images/DPT.png>] [4] (./thesis.aux) ) 
 Here is how much of TeX's memory you used:
- 2893 strings out of 492649
- 39057 string characters out of 6129622
- 112572 words of memory out of 5000000
- 6733 multiletter control sequences out of 15000+600000
+ 2905 strings out of 492649
+ 39252 string characters out of 6129622
+ 111583 words of memory out of 5000000
+ 6741 multiletter control sequences out of 15000+600000
  11352 words of font info for 43 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 41i,7n,32p,273b,199s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 41i,7n,32p,676b,232s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb>
-Output written on thesis.pdf (2 pages, 69441 bytes).
+Output written on thesis.pdf (4 pages, 432946 bytes).
 PDF statistics:
- 31 PDF objects out of 1000 (max. 8388607)
- 21 compressed objects within 1 object stream
+ 42 PDF objects out of 1000 (max. 8388607)
+ 26 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 11 words of extra memory for PDF output out of 10000 (max. 10000000)
 

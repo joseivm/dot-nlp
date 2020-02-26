@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1581445307 "thesis.tex" "thesis.pdf" "thesis" 1581445308
+["pdflatex"] 1582659529 "thesis.tex" "thesis.pdf" "thesis" 1582659530
   "/usr/local/texlive/2018/texmf-dist/fonts/map/fontname/texfonts.map" 1511824771 3332 103109f5612ad95229751940c61aada0 ""
   "/usr/local/texlive/2018/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1480098698 1004 54797486969f23fa377b128694d548df ""
   "/usr/local/texlive/2018/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1480098698 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
@@ -65,11 +65,13 @@
   "/usr/local/texlive/2018/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1523934492 2717033 f61a5287d9c22a39a74f1979fe3f905c ""
   "/usr/local/texlive/2018/texmf-var/web2c/pdftex/pdflatex.fmt" 1523934516 4220280 10cab8fbd7c5a7c52aba9917e190d018 ""
   "/usr/local/texlive/2018/texmf.cnf" 1523934483 577 0b39adfd7c93507ff20c9c14c2f1a33f ""
-  "thesis.aux" 1581445308 1663 40db53cce7ad79cacf0ed15b3c037d21 ""
-  "thesis.tex" 1581445306 854 c9b035ca286b808cff16a70be5c90183 ""
-  "thesis.toc" 1581445308 1277 19257dec0f43ba985223a3d0b69bc7a1 ""
+  "images/DPT.png" 1562162630 171804 a7d8113d3587aa9e185c8b500f2fe52a ""
+  "images/dot_def.png" 1564459160 236619 58136c5e2b74dff4eb75a6bc041a552b ""
+  "thesis.aux" 1582659529 1952 f7f18350e2ad0f778bc9c03f757f464d ""
+  "thesis.tex" 1582659527 4725 283da1171953c4d25940a1702f53b722 ""
+  "thesis.toc" 1582659529 1336 5158b00b61f0148392027baa9acae03b ""
   (generated)
-  "thesis.log"
-  "thesis.toc"
-  "thesis.pdf"
   "thesis.aux"
+  "thesis.toc"
+  "thesis.log"
+  "thesis.pdf"

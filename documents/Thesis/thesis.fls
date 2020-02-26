@@ -110,6 +110,12 @@ OUTPUT thesis.toc
 INPUT /usr/local/texlive/2018/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
 OUTPUT thesis.pdf
 INPUT /usr/local/texlive/2018/texmf-var/fonts/map/pdftex/updmap/pdftex.map
+INPUT images/dot_def.png
+INPUT ./images/dot_def.png
+INPUT ./images/dot_def.png
+INPUT images/DPT.png
+INPUT ./images/DPT.png
+INPUT ./images/DPT.png
 INPUT thesis.aux
 INPUT /usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 INPUT /usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
