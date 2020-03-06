@@ -80,13 +80,13 @@ def train_model(args):
     num_labels = len(label_list)
 
     config_class, model_class, tokenizer_class = MODEL_CLASSES['roberta']
-    config = config_class.from_pretrained('roberta-base',
+    config = config_class.from_pretrained(args.model,
                                           num_labels=num_labels,
                                           cache_dir=None)
-    tokenizer = tokenizer_class.from_pretrained('roberta-base',
+    tokenizer = tokenizer_class.from_pretrained(args.model,
                                                 do_lower_case=args.do_lower_case,
                                                 cache_dir= None)
-    model = model_class.from_pretrained('roberta-base',
+    model = model_class.from_pretrained(args.model,
                                         config=config,
                                         cache_dir=None)
 
