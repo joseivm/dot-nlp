@@ -103,17 +103,18 @@ class DataProcessor(object):
 class DPTProcessor(DataProcessor):
     """Processor for the DOT data set"""
 
-    def get_examples(self,data_dir,set_type):
+    def get_examples(self,data_dir,set_type,code=''):
         lines = self.read_csv(data_dir+'/'+set_type+'.csv')
-        examples = self.create_examples(lines,set_type)
+        examples = self.create_examples(lines,set_type,code)
         return(examples)
 
-    def get_labels(self):
+    def get_labels(self,code=''):
         """See base class."""
         data_codes = range(7)
         people_codes = range(9)
         things_codes = range(8)
         labels = [str(d)+str(p)+str(t) for d in data_codes for p in people_codes for t in things_codes]
+        labels = [None] if code else labels
         return labels
 
     def read_csv(self,input_file):
@@ -121,17 +122,19 @@ class DPTProcessor(DataProcessor):
         lines = df.to_numpy().tolist()
         return(lines)
 
-    def create_examples(self,lines,set_type):
+    def create_examples(self,lines,set_type,code=''):
         examples = []
+        code_to_idx = {'data':0,'people':1,'things':2,'':None}
+        label_idx = code_to_idx[code]
         for (i, line) in enumerate(lines):
             guid = "%s-%s" % (set_type, i)
             text_a = line[2]
             label = line[3][1:]
-            # label = int(label)
+            label = label[label_idx] if code else label
             examples.append(InputExample(guid=guid, text_a=text_a, label=label))
         return examples
 
-    def convert_examples_to_features(self,examples, tokenizer,
+    def convert_examples_to_features(self,examples, tokenizer,output_mode,
                                           max_length=190,
                                           pad_on_left=False,
                                           pad_token=0,
@@ -155,7 +158,6 @@ class DPTProcessor(DataProcessor):
         """
 
         label_list = self.get_labels()
-        output_mode = 'classification'
         label_map = {label: i for i, label in enumerate(label_list)}
 
         features = []
@@ -188,7 +190,10 @@ class DPTProcessor(DataProcessor):
             assert len(attention_mask) == max_length, "Error with input length {} vs {}".format(len(attention_mask), max_length)
             assert len(token_type_ids) == max_length, "Error with input length {} vs {}".format(len(token_type_ids), max_length)
 
-            label = label_map[example.label]
+            if output_mode == 'classification':
+                label = label_map[example.label]
+            elif output_mode == 'regression':
+                label = float(example.label)
 
             features.append(
                     InputFeatures(input_ids=input_ids,
@@ -201,12 +206,12 @@ class DPTProcessor(DataProcessor):
 class AttributesProcessor(DataProcessor):
     """Processor for the DOT data set"""
 
-    def get_examples(self,data_dir,set_type):
+    def get_examples(self,data_dir,set_type,code=''):
         lines = self.read_csv(data_dir+'/'+set_type+'.csv')
-        examples = self.create_examples(lines,set_type)
+        examples = self.create_examples(lines,set_type,code)
         return(examples)
 
-    def get_labels(self):
+    def get_labels(self,code=''):
         GED = np.arange(1.5,6.5,0.5)
         coord = [1.0,2.5,3.0,3.5,4.0,4.5,5.0]
         finger_dext = np.arange(1.5,5,0.5)
@@ -214,6 +219,7 @@ class AttributesProcessor(DataProcessor):
         dcp = [0,1]
         labels = [(str(G),str(c),str(f),str(s),str(d))
         for G in GED for c in coord for f in finger_dext for s in sts for d in dcp]
+        labels = [None] if code else labels
         return labels
 
     def read_csv(self,input_file):
@@ -221,18 +227,20 @@ class AttributesProcessor(DataProcessor):
         lines = df.to_numpy().tolist()
         return(lines)
 
-    def create_examples(self,lines,set_type):
+    def create_examples(self,lines,set_type,code=''):
         examples = []
+        code_to_idx = {'GED':0,'EHFCoord':1,'FingerDexterity':2,'DCP':3,'STS':4}
+        label_idx = code_to_idx[code]
         for (i, line) in enumerate(lines):
             guid = "%s-%s" % (set_type, i)
             text_a = line[2]
             label = (line[5],line[6],line[7],line[8],line[9])
             label = tuple(str(i) for i in label)
-            # label = int(label)
+            label = label[label_idx] if code else label
             examples.append(InputExample(guid=guid, text_a=text_a, label=label))
         return examples
 
-    def convert_examples_to_features(self,examples, tokenizer,
+    def convert_examples_to_features(self,examples, tokenizer, output_mode,
                                           max_length=190,
                                           pad_on_left=False,
                                           pad_token=0,
@@ -256,7 +264,6 @@ class AttributesProcessor(DataProcessor):
         """
 
         label_list = self.get_labels()
-        output_mode = 'classification'
         label_map = {label: i for i, label in enumerate(label_list)}
 
         features = []
@@ -288,7 +295,10 @@ class AttributesProcessor(DataProcessor):
             assert len(attention_mask) == max_length, "Error with input length {} vs {}".format(len(attention_mask), max_length)
             assert len(token_type_ids) == max_length, "Error with input length {} vs {}".format(len(token_type_ids), max_length)
 
-            label = label_map[example.label]
+            if output_mode == 'classification':
+                label = label_map[example.label]
+            elif output_mode == 'regression':
+                label = float(example.label)
 
             features.append(
                     InputFeatures(input_ids=input_ids,

@@ -84,6 +84,13 @@ def roberta_parser():
                         help="model identifier")
 
     ## Other parameters
+    parser.add_argument("--model",
+                        default="roberta-base",
+                        type=str,
+                        help="RoBERTa model to use (base or large) ")
+    parser.add_argument("--output_mode",
+                        default='classification',
+                        help='Ouptut mode, must be classification or regression')
     parser.add_argument("--max_seq_length",
                         default=128,
                         type=int,

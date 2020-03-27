@@ -39,22 +39,20 @@ MODEL_CLASSES = {
 
 PROCESSORS = {'DPT' : rfb.DPTProcessor, 'Attr' : rfb.AttributesProcessor}
 TASK_YEARS = {'DPT': ['1965','1977'],'Attr':['1965','1991']}
-
-
+TASK_CODES = {'DPT': ['data','people','things'], 'Attr': ['GED','EHFCoord','FingerDexterity','DCP','STS']}
 
 def set_seed(args):
     random.seed(args.seed)
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
 
-def load_examples(args, processor, tokenizer, year,type='train'):
+def load_examples(args, code, processor, tokenizer, year,type='train'):
     output_mode = args.output_mode
     data_dir = os.path.join(PROJECT_DIR,'data',args.task_name,year)
-    # Load data features from cache or dataset file
 
-    label_list = processor.get_labels()
+    label_list = processor.get_labels(code)
 
-    examples = processor.get_examples(data_dir,type)
+    examples = processor.get_examples(data_dir,type,code)
     features = processor.convert_examples_to_features(examples,tokenizer,max_length=args.max_seq_length)
 
     # Convert to Tensors and build dataset
@@ -69,14 +67,13 @@ def load_examples(args, processor, tokenizer, year,type='train'):
     dataset = TensorDataset(all_input_ids, all_attention_mask, all_token_type_ids, all_labels)
     return dataset
 
-def train_model(args):
-    model_dir = os.path.join(PROJECT_DIR,"models",args.task_name,args.identifier)
+def train_model(args,code):
+    model_dir = os.path.join(PROJECT_DIR,"models",args.task_name,'separate',args.identifier,code)
     # Set seed
     set_seed(args)
 
-    # Prepare GLUE task
     processor = PROCESSORS[args.task_name]()
-    label_list = processor.get_labels()
+    label_list = processor.get_labels(code)
     num_labels = len(label_list)
 
     config_class, model_class, tokenizer_class = MODEL_CLASSES['roberta']
@@ -92,19 +89,15 @@ def train_model(args):
 
     model.to(args.device)
 
-
-    train_dataset = load_examples(args, processor,tokenizer, args.train_year,type='train')
+    train_dataset = load_examples(args, code, processor,tokenizer, args.train_year,type='train')
     global_step, tr_loss = train(args, train_dataset, model, tokenizer)
-
 
     print("Done Training")
 
-def train(args, train_dataset, model, tokenizer):
+def train(args, code, train_dataset, model, tokenizer):
     """ Train the model """
     train_data_dir = os.path.join(PROJECT_DIR,"data",args.task_name,args.train_year)
-    model_dir = os.path.join(PROJECT_DIR,"models",args.task_name,args.identifier)
-    results_dir = os.path.join(PROJECT_DIR,"results",args.task_name)
-    output_dir = os.path.join(PROJECT_DIR,"output",args.task_name)
+    model_dir = os.path.join(PROJECT_DIR,"models",args.task_name,'separate',args.identifier,code)
 
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
@@ -162,7 +155,7 @@ def train(args, train_dataset, model, tokenizer):
                 global_step += 1
 
         else:
-            eval_loss = get_eval_loss(args, model, tokenizer)
+            eval_loss = get_eval_loss(args, code, model, tokenizer)
             if eval_loss < min_eval_loss:
                 # Save model checkpoint
                 model_to_save = model.module if hasattr(model, 'module') else model  # Take care of distributed/parallel training
@@ -178,10 +171,10 @@ def train(args, train_dataset, model, tokenizer):
 
     return global_step, tr_loss / global_step
 
-def get_eval_loss(args, model, tokenizer):
+def get_eval_loss(args, code, model, tokenizer):
     eval_task = args.task_name
     processor = PROCESSORS[args.task_name]()
-    eval_dataset = load_examples(args, processor, tokenizer, args.train_year,type='dev')
+    eval_dataset = load_examples(args, code, processor, tokenizer, args.train_year,type='dev')
 
     # Note that DistributedSampler samples randomly
     eval_sampler = SequentialSampler(eval_dataset)
@@ -215,12 +208,11 @@ def get_eval_loss(args, model, tokenizer):
             out_label_ids = np.append(out_label_ids, inputs['labels'].detach().cpu().numpy(), axis=0)
 
     eval_loss = eval_loss / nb_eval_steps
-    preds = np.argmax(preds, axis=1)
 
     return eval_loss
 
 def evaluate_model(args):
-    model_dir = os.path.join(PROJECT_DIR,"models",args.task_name,args.identifier)
+    model_dir = os.path.join(PROJECT_DIR,"models",args.task_name,'separate',args.identifier)
 
     tokenizer = RobertaTokenizer.from_pretrained(model_dir, do_lower_case=args.do_lower_case)
     model = RobertaForSequenceClassification.from_pretrained(model_dir)
@@ -228,17 +220,14 @@ def evaluate_model(args):
     for year in TASK_YEARS[args.task_name]:
         evaluate(args, model, tokenizer,year,'test')
 
-def evaluate(args, model, tokenizer, eval_year, eval_type):
-    eval_results_dir = os.path.join(PROJECT_DIR,"results",args.task_name)
-    eval_output_dir = os.path.join(PROJECT_DIR,"output",args.task_name)
+# this function will write out the model predictions to a file. Think about renaming
+def evaluate(args, code, model, tokenizer, eval_year, eval_type):
+    eval_output_dir = os.path.join(PROJECT_DIR,"output",args.task_name,'separate')
+    eval_output_file = os.path.join(eval_output_dir,args.identifier+'_'+eval_year+'_'+eval_type+'_preds.csv')
     data_dir = os.path.join(PROJECT_DIR,'data',args.task_name, eval_year)
 
-    results = {}
     processor = PROCESSORS[args.task_name]()
-    eval_dataset = load_examples(args, processor, tokenizer, eval_year, type=eval_type)
-
-    if not os.path.exists(eval_results_dir):
-        os.makedirs(eval_results_dir)
+    eval_dataset = load_examples(args, code, processor, tokenizer, eval_year, type=eval_type)
 
     # Note that DistributedSampler samples randomly
     eval_sampler = SequentialSampler(eval_dataset)
@@ -272,33 +261,51 @@ def evaluate(args, model, tokenizer, eval_year, eval_type):
             out_label_ids = np.append(out_label_ids, inputs['labels'].detach().cpu().numpy(), axis=0)
 
     eval_loss = eval_loss / nb_eval_steps
-    preds = np.argmax(preds, axis=1)
+    if args.output_mode == "classification":
+        preds = np.argmax(preds, axis=1)
+    elif args.output_mode == "regression":
+        preds = np.squeeze(preds)
 
-    df = pd.read_csv(data_dir+'/'+eval_type+ '.csv')
-    preds_name = 'pred_'+args.task_name
-    identifier = args.identifier
+    if os.path.exists(output_eval_file):
+        df = pd.read_csv(output_eval_file)
+    else:
+        df = pd.read_csv(data_dir+'/'+eval_type+ '.csv')
+    preds_name = 'pred_'+code
     df[preds_name] = preds
-    label_list = processor.get_labels()
-    label_map = {i: label for i, label in enumerate(label_list)}
-    df[preds_name] = df[preds_name].apply(lambda x: label_map[x])
+    df.to_csv(eval_output_file,index=False)
+
+def evaluate_predictions(args):
+    eval_results_dir = os.path.join(PROJECT_DIR,"results",args.task_name,'separate')
+    eval_output_dir = os.path.join(PROJECT_DIR,"output",args.task_name,'separate')
+    eval_output_file = os.path.join(eval_output_dir,args.identifier+'_'+eval_year+'_'+eval_type+'_preds.csv')
+    data_dir = os.path.join(PROJECT_DIR,'data',args.task_name, eval_year)
+
+    df = pd.read_csv(output_eval_file)
+    preds_name = 'pred_'+args.task_name
+    df[preds_name] = list(zip(df.pred_GED.astype(str),df.pred_EHFCoord.astype(str),
+                          df.pred_FingerDexterity.astype(str),df.pred_DCP.astype(str),
+                          df.pred_STS.astype(str)))
+    df[preds_name] = df[preds_name].astype(str)
     df = df[['Title','Code','Definition',preds_name,args.task_name]]
     labels = df[args.task_name]
-    df.to_csv(os.path.join(eval_output_dir,identifier+'_'+eval_year+'_'+eval_type+'_preds.csv'),index=False)
+    df.to_csv(eval_output_file,index=False)
     result = eu.evaluate_predictions(df[preds_name],labels,args.task_name)
     output_eval_file = os.path.join(eval_results_dir,args.identifier+'_' + eval_year + "_"+eval_type +"_results.csv")
-    result.to_csv(output_eval_file,index=False,float_format='%.3f')
+    result.to_csv(output_eval_file)
 
     print(result)
 
 def main():
     parser = utils.roberta_parser()
     args = parser.parse_args()
-    if not args.no_train:
-        print('train')
-        train_model(args)
+    task_codes = TASK_CODES[args.task_name]
+    for code in task codes:
+        if not args.no_train:
+            train_model(args,code)
 
-    if not args.no_eval:
-        print('eval')
-        evaluate_model(args)
+        if not args.no_eval:
+            evaluate_model(args,code)
+            
+    evaluate_predictions(args)
 
 main()

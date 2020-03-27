@@ -15,7 +15,6 @@ def evaluate_dpt_predictions(preds,labels):
     results = []
     str_preds = preds.astype(str).apply(to_three_digit)
     labels = labels.str.slice(start=1)
-    # results['Overall accuracy'] = (labels == str_preds).mean()
     for code, idx in code_to_idx.items():
         code_preds = str_preds.str.slice(start=idx,stop=idx+1).astype(int)
         code_labels = labels.str.slice(start=idx,stop=idx+1).astype(int)
@@ -23,7 +22,8 @@ def evaluate_dpt_predictions(preds,labels):
         code_dist = (code_preds - code_labels).abs().mean()
         code_corr = pearsonr(code_preds,code_labels)[0]
         code_rank_corr = spearmanr(code_preds,code_labels)[0]
-        results.append({'Attribute':code,'Accuracy':code_accuracy,
+        code_mse = (code_preds - code_labels).apply(lambda x: x**2).mean()
+        results.append({'Attribute':code,'Accuracy':code_accuracy, 'MSE': code_mse,
                         'Correlation':code_corr,'Rank Correlation':code_rank_corr})
 
     return pd.DataFrame(results)
@@ -33,7 +33,6 @@ def evaluate_attr_predictions(preds,labels):
     results = []
     # preds = preds.apply(lambda x: ast.literal_eval(x))
     labels = labels.apply(lambda x: ast.literal_eval(x))
-    # results['Overall accuracy'] = (labels == preds).mean()
     for code, idx in code_to_idx.items():
         code_preds = preds.apply(lambda x: x[idx]).astype(float)
         code_labels = labels.apply(lambda x: x[idx]).astype(float)
@@ -41,6 +40,7 @@ def evaluate_attr_predictions(preds,labels):
         code_dist = (code_preds - code_labels).abs().mean()
         code_corr = pearsonr(code_preds,code_labels)[0]
         code_rank_corr = spearmanr(code_preds,code_labels)[0]
+        code_mse = (code_preds - code_labels).apply(lambda x: x**2).mean()
         if code in HML_dict.keys():
             quantiles = HML_dict[code]
             pred_low = code_preds.apply(lambda x: x < quantiles[0])
@@ -54,10 +54,10 @@ def evaluate_attr_predictions(preds,labels):
             label_hml = label_low + label_medium + label_high
 
             hml_accuracy = (pred_hml == label_hml).mean()
-            results.append({'Attribute':code,'Accuracy':code_accuracy,'HML Accuracy':hml_accuracy,
+            results.append({'Attribute':code,'Accuracy':code_accuracy,'MSE':code_mse,
                             'Correlation':code_corr,'Rank Correlation':code_rank_corr})
         else:
-            results.append({'Attribute':code,'Accuracy':code_accuracy,'HML Accuracy':0,
+            results.append({'Attribute':code,'Accuracy':code_accuracy,'MSE':code_mse,
                         'Correlation':code_corr,'Rank Correlation':code_rank_corr})
     return pd.DataFrame(results)
 
