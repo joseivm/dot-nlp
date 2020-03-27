@@ -15,7 +15,7 @@ def evaluate_dpt_predictions(preds,labels):
     results = []
     str_preds = preds.astype(str).apply(to_three_digit)
     labels = labels.str.slice(start=1)
-    results['Overall accuracy'] = (labels == str_preds).mean()
+    # results['Overall accuracy'] = (labels == str_preds).mean()
     for code, idx in code_to_idx.items():
         code_preds = str_preds.str.slice(start=idx,stop=idx+1).astype(int)
         code_labels = labels.str.slice(start=idx,stop=idx+1).astype(int)
@@ -46,7 +46,7 @@ def evaluate_attr_predictions(preds,labels):
             pred_low = code_preds.apply(lambda x: x < quantiles[0])
             pred_medium = code_preds.apply(lambda x: x >= quantiles[0] and x < quantiles[1])
             pred_high = code_preds.apply(lambda x: x >= quantiles[1])
-            pred_hml = code_low + code_medium + code_high
+            pred_hml = pred_low + pred_medium + pred_high
 
             label_low = code_labels.apply(lambda x: x < quantiles[0])
             label_medium = code_labels.apply(lambda x: x >= quantiles[0] and x < quantiles[1])
