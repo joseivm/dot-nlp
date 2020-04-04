@@ -17,7 +17,7 @@ class ParserHelper:
     def __init__(self):
         self.code_regex = re.compile("[\d]{3}[\s\.]{1,4}[\d]{3}")
         self.starts_with_title_regex = re.compile("^[A-Z]+[A-Z \-\,\.']+\([a-zA-Z\s\-\.,;\&]+\)")
-        self.full_title_regex = re.compile("[A-Z]+[A-Z \-\,\.]+\([a-zA-Z\s\-\.,;\&]+\)")
+        self.full_title_regex = re.compile("[A-Z]+[A-Z \-\,\.']+\([a-zA-Z\s\-\.,;\&]+\)")
         self.lone_title_regex = re.compile("[A-Z]+[A-Z \-\,\.]+")
         self.lone_industry_regex = re.compile("^\([a-zA-Z\s\-\.,;\&]+\)")
         self.industry_regex = re.compile("\([a-zA-Z\s\-\.,;\&]+\)")
