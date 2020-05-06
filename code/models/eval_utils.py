@@ -31,7 +31,7 @@ def evaluate_dpt_predictions(preds,labels):
 def evaluate_attr_predictions(preds,labels):
     code_to_idx = {'GED':0,'EHFCoord':1,'FingerDexterity':2,'DCP':3,'STS':4}
     results = []
-    # preds = preds.apply(lambda x: ast.literal_eval(x))
+    preds = preds.apply(lambda x: ast.literal_eval(x))
     labels = labels.apply(lambda x: ast.literal_eval(x))
     for code, idx in code_to_idx.items():
         code_preds = preds.apply(lambda x: x[idx]).astype(float)
@@ -46,7 +46,7 @@ def evaluate_attr_predictions(preds,labels):
             pred_low = code_preds.apply(lambda x: x < quantiles[0])
             pred_medium = code_preds.apply(lambda x: x >= quantiles[0] and x < quantiles[1])
             pred_high = code_preds.apply(lambda x: x >= quantiles[1])
-            pred_hml = code_low + code_medium + code_high
+            pred_hml = pred_low + pred_medium + pred_high
 
             label_low = code_labels.apply(lambda x: x < quantiles[0])
             label_medium = code_labels.apply(lambda x: x >= quantiles[0] and x < quantiles[1])

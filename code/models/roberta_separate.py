@@ -53,7 +53,7 @@ def load_examples(args, code, processor, tokenizer, year,type='train'):
     label_list = processor.get_labels(code)
 
     examples = processor.get_examples(data_dir,type,code)
-    features = processor.convert_examples_to_features(examples,tokenizer,max_length=args.max_seq_length)
+    features = processor.convert_examples_to_features(examples,tokenizer,output_mode=args.output_mode,max_length=args.max_seq_length)
 
     # Convert to Tensors and build dataset
     all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
@@ -90,7 +90,7 @@ def train_model(args,code):
     model.to(args.device)
 
     train_dataset = load_examples(args, code, processor,tokenizer, args.train_year,type='train')
-    global_step, tr_loss = train(args, train_dataset, model, tokenizer)
+    global_step, tr_loss = train(args, code, train_dataset, model, tokenizer)
 
     print("Done Training")
 
@@ -211,14 +211,14 @@ def get_eval_loss(args, code, model, tokenizer):
 
     return eval_loss
 
-def evaluate_model(args):
-    model_dir = os.path.join(PROJECT_DIR,"models",args.task_name,'separate',args.identifier)
+def evaluate_model(args,code):
+    model_dir = os.path.join(PROJECT_DIR,"models",args.task_name,'separate',args.identifier,code)
 
     tokenizer = RobertaTokenizer.from_pretrained(model_dir, do_lower_case=args.do_lower_case)
     model = RobertaForSequenceClassification.from_pretrained(model_dir)
     model.to(args.device)
     for year in TASK_YEARS[args.task_name]:
-        evaluate(args, model, tokenizer,year,'test')
+        evaluate(args, code, model, tokenizer,year,'test')
 
 # this function will write out the model predictions to a file. Think about renaming
 def evaluate(args, code, model, tokenizer, eval_year, eval_type):
@@ -266,21 +266,22 @@ def evaluate(args, code, model, tokenizer, eval_year, eval_type):
     elif args.output_mode == "regression":
         preds = np.squeeze(preds)
 
-    if os.path.exists(output_eval_file):
-        df = pd.read_csv(output_eval_file)
+    if os.path.exists(eval_output_file):
+        df = pd.read_csv(eval_output_file)
     else:
         df = pd.read_csv(data_dir+'/'+eval_type+ '.csv')
     preds_name = 'pred_'+code
     df[preds_name] = preds
     df.to_csv(eval_output_file,index=False)
 
-def evaluate_predictions(args):
+def evaluate_predictions(args,eval_year):
+    eval_type = 'test'
     eval_results_dir = os.path.join(PROJECT_DIR,"results",args.task_name,'separate')
     eval_output_dir = os.path.join(PROJECT_DIR,"output",args.task_name,'separate')
     eval_output_file = os.path.join(eval_output_dir,args.identifier+'_'+eval_year+'_'+eval_type+'_preds.csv')
     data_dir = os.path.join(PROJECT_DIR,'data',args.task_name, eval_year)
 
-    df = pd.read_csv(output_eval_file)
+    df = pd.read_csv(eval_output_file)
     preds_name = 'pred_'+args.task_name
     df[preds_name] = list(zip(df.pred_GED.astype(str),df.pred_EHFCoord.astype(str),
                           df.pred_FingerDexterity.astype(str),df.pred_DCP.astype(str),
@@ -290,8 +291,8 @@ def evaluate_predictions(args):
     labels = df[args.task_name]
     df.to_csv(eval_output_file,index=False)
     result = eu.evaluate_predictions(df[preds_name],labels,args.task_name)
-    output_eval_file = os.path.join(eval_results_dir,args.identifier+'_' + eval_year + "_"+eval_type +"_results.csv")
-    result.to_csv(output_eval_file)
+    eval_results_file = os.path.join(eval_results_dir,args.identifier+'_' + eval_year + "_"+eval_type +"_results.csv")
+    result.to_csv(eval_results_file,float_format='%.3f')
 
     print(result)
 
@@ -299,13 +300,13 @@ def main():
     parser = utils.roberta_parser()
     args = parser.parse_args()
     task_codes = TASK_CODES[args.task_name]
-    for code in task codes:
-        if not args.no_train:
-            train_model(args,code)
+    task_years = TASK_YEARS[args.task_name]
+    if not args.no_train:
+        [train_model(args,code) for code in task_codes]
 
-        if not args.no_eval:
-            evaluate_model(args,code)
-            
-    evaluate_predictions(args)
+    if not args.no_eval:
+        [evaluate_model(args,code) for code in task_codes]
+
+    [evaluate_predictions(args,year) for year in task_years]
 
 main()

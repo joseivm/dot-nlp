@@ -1,0 +1,6 @@
+,Accuracy,Attribute,Correlation,MSE,Rank Correlation
+0,0.000,GED,0.917,0.221,0.900
+1,0.000,EHFCoord,0.624,0.125,0.632
+2,0.000,FingerDexterity,0.701,0.121,0.642
+3,0.000,DCP,0.833,0.043,0.600
+4,0.000,STS,0.404,0.235,0.392
