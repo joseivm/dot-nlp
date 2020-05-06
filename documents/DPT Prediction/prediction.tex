@@ -1,0 +1,63 @@
+\documentclass[11pt]{article}
+
+\title{Data, People, Things Prediction}
+
+\begin{document}
+\maketitle
+
+This document contains updated tables with the performance of our model on the prediction of the DOT data, people, things codes. We are able to predict all codes, even across years with an accuracy of at least $77\%$.
+
+\section{Model trained on 1965 Data}
+  \begin{table}[h!]
+    \centering
+    \caption{Performance on 1965 Data}
+    \label{table:dpt-1965}
+    \begin{tabular}{|l|l|l|l|}
+        \hline
+        \textbf{Attribute} & \textbf{Accuracy} & \textbf{Correlation} & \textbf{Rank Correlation} \\ \hline
+        data               & 0.844             & 0.901                & 0.893                     \\ \hline
+        people             & 0.949             & 0.905                & 0.919                     \\ \hline
+        things             & 0.789             & 0.795                & 0.774                     \\ \hline
+    \end{tabular}
+  \end{table}
+
+    \begin{table}[h!]
+      \centering
+      \label{table:dpt-1977}
+      \caption{Performance on 1977 Data}
+      \begin{tabular}{|l|l|l|l|}
+        \hline
+        \textbf{Attribute} & \textbf{Accuracy} & \textbf{Correlation} & \textbf{Rank Correlation} \\ \hline
+        data               & 0.799             & 0.883                & 0.871                     \\ \hline
+        people             & 0.839             & 0.870                & 0.786                     \\ \hline
+        things             & 0.842             & 0.808                & 0.798                     \\ \hline
+      \end{tabular}
+    \end{table}
+
+\section{Model trained on 1977 Data}
+
+  \begin{table}[h!]
+    \centering
+    \caption{Performance on 1965 Data}
+    \begin{tabular}{|l|l|l|l|}
+    \hline
+    \textbf{Attribute} & \textbf{Accuracy} & \textbf{Correlation} & \textbf{Rank Correlation} \\ \hline
+    data               & .79              & .86                  & .85                       \\ \hline
+    people             & .83              & .82                  & .76                       \\ \hline
+    things             & .77              & .75                  & .74                       \\ \hline
+    \end{tabular}
+  \end{table}
+
+  \begin{table}[h!]
+    \centering
+    \caption{Performance on 1977 Data}
+  \begin{tabular}{|l|l|l|l|}
+  \hline
+  \textbf{Attribute} & \textbf{Accuracy} & \textbf{Correlation} & \textbf{Rank Correlation} \\ \hline
+  data               & .80              & .89                  & .89                       \\ \hline
+  people             & .86              & .85                  & .84                       \\ \hline
+  things             & .81              & .79                  & .78                       \\ \hline
+  \end{tabular}
+  \end{table}
+
+\end{document}
