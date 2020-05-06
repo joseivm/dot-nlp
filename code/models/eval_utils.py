@@ -31,7 +31,7 @@ def evaluate_dpt_predictions(preds,labels):
 def evaluate_attr_predictions(preds,labels):
     code_to_idx = {'GED':0,'EHFCoord':1,'FingerDexterity':2,'DCP':3,'STS':4}
     results = []
-    # preds = preds.apply(lambda x: ast.literal_eval(x))
+    preds = preds.apply(lambda x: ast.literal_eval(x))
     labels = labels.apply(lambda x: ast.literal_eval(x))
     for code, idx in code_to_idx.items():
         code_preds = preds.apply(lambda x: x[idx]).astype(float)

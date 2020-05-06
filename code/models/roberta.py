@@ -281,6 +281,7 @@ def evaluate(args, model, tokenizer, eval_year, eval_type):
     label_list = processor.get_labels()
     label_map = {i: label for i, label in enumerate(label_list)}
     df[preds_name] = df[preds_name].apply(lambda x: label_map[x])
+    df[preds_name] = df[preds_name].astype(str)
     df = df[['Title','Code','Definition',preds_name,args.task_name]]
     labels = df[args.task_name]
     df.to_csv(os.path.join(eval_output_dir,identifier+'_'+eval_year+'_'+eval_type+'_preds.csv'),index=False)
