@@ -168,7 +168,7 @@ class AttributesParser91:
     def parse(self,dot):
         for line in dot:
             entry = {}
-            dot_code = line[8:16]
+            dot_code = line[7:16]
             definition_type = line[16]
             update_date = line[17:19]
             dpt_code = line[19:25]

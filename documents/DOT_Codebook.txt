@@ -1,0 +1,1320 @@
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                 North Carolina                                 
+                        Occupational Analysis Field Center                      
+                                                                                
+                                                                                
+                        Dictionary of Occupational Titles                       
+                                File Documentation                              
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                      Revised: 10/26/92         
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                                                                                
+                                  SPECIAL NOTICE                                
+                                                                                
+                                                                                
+                                                                                
+Data records which were not previously published in the printed version of the  
+Dictionary of Occupational Titles (DOT) revised fourth edition 1991 are copy-   
+righted by the North Carolina Occupational Analysis Field Center.  Source       
+for these components are the U.S. Employment Service, U.S. Department of Labor  
+and the North Carolina Occupational Analysis Field Center.                      
+                                                                                
+                                                                                
+Copyrighted component ratings specifically include:  Work Fields; MPSMS;        
+Significant Worker Functions; Temperaments; Aptitudes; Environmental            
+Conditions; and Physical Demands, except Strength.                              
+                                                                                
+                                                                                
+Data records and text material which appeared in the printed version of the     
+Dictionary of Occupational Titles (DOT) revised fourth edition 1991 are in the  
+public domain and may be reproduced fully or partially, without the permission  
+of the Federal Government.  Source credit is requested but not required.        
+                                                                                
+                                                                                
+Public domain information includes:                                             
+                                                                                
+  Data in these text files:  Message.asc; Preface.asc; Forward.asc;             
+  Acknowl.asc; Contents.asc; Special.asc; Intro.asc; Parts.asc;                 
+  How2find.asc; Catdivgp.asc; Apdx1.asc; Apdx2.asc; Apdx3.asc;                  
+  Apdx4.asc; Apdx5.asc; and Indndx.asc.                                         
+                                                                                
+  These Component ratings: DOT Code; Date of Update; General Education          
+  Development (R,M, and L); Specific Vocational Preparation; Strength           
+  Level; Guide for Occupational Exploration Code; Industry Designations;        
+  DOT Titles (master, term, alternate, base, and undefined related);            
+  Definition Text; Glossary definitions; and Category, Division, and            
+  Group definitions.                                                            
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+               North Carolina Occupational Analysis Field Center                
+               Employment Security Commission of North Carolina                 
+                                700 Wade Avenue                                 
+                             Post Office Box 27625                              
+                         Raleigh, North Carolina 27611                          
+                           Telephone (919) 733-7917                             
+                              FAX (919) 733-0981                                
+                               November 1, 1992                                 
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page   1       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+              INVENTORY OF ELECTRONIC DOT DISKETTES AND FILES                   
+                                                                                
+                                                                                
+                                                                                
+DISK NUMBER     FILES INCLUDED                                                  
+                                                                                
+                                                                                
+  DISK #1       18 TEXT FILES, INCLUDING DOCUMENTATION                          
+  DISK #2       GLOSSARY.ASC, MASTERS.ASC, TERMS.ASC, DOTIND.ASC                
+  DISK #3       ALTITLE.ASC                                                     
+  DISK #4       CATEGORY.ASC, DIVISION.ASC, GROUPS.ASC                          
+  DISK #5       DEFMISC1.ASC, DEFMISC2.ASC                                      
+  DISK #6       TITLES1.ASC                                                     
+  DISK #7       TITLES2.ASC                                                     
+  DISK #8       TITLES3.ASC                                                     
+  DISK #9       TITLES4.ASC                                                     
+  DISK #10      TITLES5.ASC                                                     
+  DISK #11      TITLES6.ASC                                                     
+  DISK #12      TITLES7.ASC                                                     
+  DISK #13      DEFDOC1.ASC                                                     
+  DISK #14      DEFDOC2.ASC                                                     
+  DISK #15      DEFDOC3.ASC                                                     
+  DISK #16      DEFDOC4.ASC                                                     
+  DISK #17      DEFDOC5.ASC                                                     
+  DISK #18      DEFDOC6.ASC                                                     
+  DISK #19      DEFDOC7.ASC                                                     
+  DISK #20      DEFDOC8.ASC                                                     
+  DISK #21      DEFDOC9.ASC                                                     
+  DISK #22      DEFDOC10.ASC                                                    
+  DISK #23      DEFDOC11.ASC                                                    
+  DISK #24      DEFDOC12.ASC                                                    
+  DISK #25      DEFDOC13.ASC                                                    
+  DISK #26      DEFDOC14.ASC                                                    
+  DISK #27      DEFDOC15.ASC                                                    
+  DISK #28      DEFDOC16.ASC                                                    
+  DISK #29      DEFDOC17.ASC                                                    
+  DISK #30      DEFDOC18.ASC                                                    
+  DISK #31      DEFDOC19.ASC                                                    
+  DISK #32      DEFDOC20.ASC                                                    
+  DISK #33      DEFDOC21.ASC                                                    
+  DISK #34      DEFDOC22.ASC                                                    
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page   2       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                              Introduction                                      
+                                                                                
+     The Dictionary of Occupational Titles (DOT) is a comprehensive manual      
+which defines occupations in the United States and its territories.  Within     
+the associated electronic media is the DOT manual.  The electronic media        
+you received contains textual and "database" files.                             
+                                                                                
+     The text files are named:                                                  
+                                                                                
+               ACKNOWL.ASC         APDX1.ASC                                    
+               APDX2.ASC           APDX3.ASC                                    
+               APDX4.ASC           APDX5.ASC                                    
+               CATDIVGP.ASC        CONTENTS.ASC                                 
+               FORWARD.ASC         HOW2FIND.ASC                                 
+               INDNDX.ASC          INTRO.ASC                                    
+               MESSAGE.ASC         PARTS.ASC                                    
+               PREFACE.ASC         SPECIAL.ASC                                  
+               TITLEPG.ASC         README.ASC                                   
+                                                                                
+     These files relate directly to section's of the printed manual.  They      
+contain introductory material, descriptions of the data itself, and             
+descriptions of how to use the information as shown in the printed version.     
+                                                                                
+The Appendices (APDX1 thru APDX5) and Parts of the Definition (PARTS) files     
+can provide you with a better understanding of the DOT data and linguistic      
+terms used to describe the data.  While working with the electronic media       
+version, we recommend you use, for additional guides, printed copies of the     
+DOT and the Handbook for Analyzing Jobs, 1991 (HAJ). Both printed references    
+are available from the Superintendent of Documents through a United States      
+Printing Office Bookstore.  The HAJ contains definitions of the contents of     
+most of the data fields in the DOT Definition Database (see pages 6 - 8).       
+                                                                                
+     All other files contain data that was used to create the heart of the      
+DOT manual.  The data in these files was extracted from the Occupational        
+Analysis Field Center mini-computer DOT databases.  Each database file has      
+an associated record layout which may be found in the following pages.          
+These "database" files are not simple text files.                               
+                                                                                
+     When looking at the individual record layouts and database files the       
+following should be noted:                                                      
+                                                                                
+          --    A document number, not DOT code, is used as the "key" which     
+                relates records together between files.                         
+                                                                                
+          --    All files consist of fixed length records.                      
+                                                                                
+          --    All files are in a standard sequential format.                  
+                                                                                
+          --    If you ordered the manual on PC diskette media, then larger     
+                files (ie.DEFDOC and TITLES) were broken into smaller more      
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page   3       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                           Introduction Con'd                                   
+                                                                                
+                manageable files and sequentially numbered (ie. DEFDOC01.ASC    
+                thru DEFDOC22.ASC).                                             
+                                                                                
+          --    If you ordered the manual on IBM 9-track tape media, then       
+                files which were broken into smaller sizes for the PC are       
+                combined into a single file.  Therefore the sequential          
+                numbering is not applicable nor is the .ASC file extension.     
+                                                                                
+          --    The "Conversion Tables" publication provides a crosswalk        
+                between definition codes and/or titles which changed, were      
+                deleted, or were added between publication of the fourth        
+                edition Dictionary of Occupational Titles (DOT), 1977 and       
+                the revised fourth edition DOT, 1991.  Please note that         
+                information other than codes and titles may have changed for    
+                any occupation. Therefore, the "Conversion Tables" are not      
+                an exhaustive list of all definitions which experienced a       
+                revision to one or more fields.                                 
+                                                                                
+          --    These databases should be used to revise any other tables       
+                or files which contain DOT data.                                
+                                                                                
+    As a general guide, the following is a list of the printed DOT manual       
+sections and the files which would be used to create each section:              
+                                                                                
+     Section                          Database Files                            
+                                                                                
+Master Titles and       DOT Master Definitions Database, 3                      
+Definitions             records from DEFMISC1 Database, DOT                     
+                        Alternate Title Database                                
+                                                                                
+Term Titles and         DOT Term Definitions Database, DOT                      
+Definitions             Alternate Title Database                                
+                                                                                
+Occupational            DOT Definition Database, 356 records                    
+Definitions:            from DEFMISC1 Database, all records from                
+  Professional,         DEMSISC2 Database, DOT Alternate Title                  
+Technical, and          Database, DOT Category Database, DOT                    
+Managerial through      Division Database, DOT Group Database                   
+Miscellaneous                                                                   
+                                                                                
+Glossary                DOT Glossary Database                                   
+                                                                                
+Occupational Titles     DOT Titles Database, DOT Industry                       
+Arranged by Industry    Database, 1 record from DEFMISC1                        
+Designation             Database                                                
+                                                                                
+Alphabetical Index      DOT Titles Database                                     
+of Occupational                                                                 
+Titles                                                                          
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page   4       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                             DOT Text Files                                     
+                                                                                
+The following files are standard text, rather than data base (record)           
+format.  Following each file name is the section name of the printed text       
+material within the Revised Fourth Edition DOT to which the file                
+corresponds.                                                                    
+                                                                                
+File Name      Printed DOT Manual Section Name                                  
+                                                                                
+ACKNOWL.ASC    Acknowledgments                                                  
+APDX1.ASC      Appendix A                                                       
+APDX2.ASC      Appendix B                                                       
+APDX3.ASC      Appendix C                                                       
+APDX4.ASC      Appendix D                                                       
+APDX5.ASC      Appendix E (does not include ETA Form 741)                       
+CATDIVGP.ASC   Occupational Categories, Divisions, and Groups                   
+CONTENTS.ASC   Contents (Table of)                                              
+FORWARD.ASC    Foreword                                                         
+HOW2FIND.ASC   How To Find an Occupational Title and Code                       
+INDNDX.ASC     Industry Index                                                   
+INTRO.ASC      Introduction                                                     
+MESSAGE.ASC    Message from the Secretary                                       
+PARTS.ASC      Parts of the Occupational Definition                             
+PREFACE.ASC    Prefatory Note                                                   
+SPECIAL.ASC    Special Notice                                                   
+TITLEPG.ASC    Title Page                                                       
+                                                                                
+README.ASC     This documentation                                               
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page   5       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                          DOT Definition Database                               
+                                                                                
+Filename = DEFDOC01.ASC thru DEFDOC22.ASC (see Page 8)                          
+Total number of records = 12741                                                 
+Record length = 1844                                                            
+                                                                                
+This "database" contains the basic information for every DOT code.  The         
+contents of most fields are explained in the 1991 Handbook for Analyzing        
+Jobs.  Description text for 356 records overflow to the miscellaneous file      
+DEFMISC1.ASC.  Of the 356 records, two (2) continue into DEFMISC2.ASC.  Use     
+Document Number to match between these files.                                   
+                                                                                
+Data Contents    Length  Comments and Valid Entries                             
+                                                                                
+Document Number     7    Unique record identifier across all files;             
+                         relationship exists among records in separate          
+                         files that have same Document Number.                  
+DOT Code            9                                                           
+Definition Type     1    Valid = 4 (nine-digit occupational definition)         
+Date of Update      2    Valid = 77 - 90                                        
+  Worker Functions (3 fields)                                                   
+Data                2    Valid = 0 - 6 in 1st, N or S in 2nd                    
+People              2    Valid = 0 - 8 in 1st, N or S in 2nd                    
+Things              2    Valid = 0 - 7 in 1st, N or S in 2nd                    
+  General Education Development (3 fields)                                      
+Reading             1    Valid = 1 - 6                                          
+Mathematical        1    Valid = 1 - 6                                          
+Language            1    Valid = 1 - 6                                          
+Spec. Voc. Prep.    1    Valid = 1 - 9                                          
+  Aptitudes (11 fields)                                                         
+General Learning    1    Valid = 1 - 5                                          
+Verbal              1    Valid = 1 - 5                                          
+Numerical           1    Valid = 1 - 5                                          
+Spacial             1    Valid = 1 - 5                                          
+Form Perception     1    Valid = 1 - 5                                          
+Clerical Percep.    1    Valid = 1 - 5                                          
+Motor Coordina.     1    Valid = 1 - 5                                          
+Finger Dexterity    1    Valid = 1 - 5                                          
+Manual Dexterity    1    Valid = 1 - 5                                          
+Eye-Hand Coord.     1    Valid = 1 - 5                                          
+Color Discrim.      1    Valid = 1 - 5                                          
+  Work Fields (3 fields)                                                        
+Field 1             3    Valid = 001 - 299                                      
+Field 2             3    Valid = 0 - 299                                        
+Field 3             3    Valid = 0 - 299                                        
+  MPSMS (3 fields)                                                              
+Field 1             3    Valid = 300 - 999                                      
+Field 2             3    Valid = 0, 300 - 999                                   
+Field 3             3    Valid = 0, 300 - 999                                   
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page   6       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                        DOT Definition Database Con't                           
+                                                                                
+Data Contents    Length  Comments and Valid Entries                             
+                                                                                
+Temperaments        9    Valid = At least one and up to five of the             
+                         following (separated by commas when more than          
+                         one): D,R,I,V,E,A,S,T,U,P,J                            
+GOE Code            6    Valid Codes printed in 1979 Guide for Occupational     
+                         Exploration                                            
+SOC Code            4    Valid Codes printed in 1980 Standard Occupational      
+                         Classification Manual                                  
+  Physical Demands (20 fields) Valid listed for each field below                
+Strength            1    S,L,M,H,V                                              
+Climbing            1    N,O,F,C                                                
+Balancing           1    N,O,F,C                                                
+Stooping            1    N,O,F,C                                                
+Kneeling            1    N,O,F,C                                                
+Crouching           1    N,O,F,C                                                
+Crawling            1    N,O,F,C                                                
+Reaching            1    N,O,F,C                                                
+Handling            1    N,O,F,C                                                
+Fingering           1    N,O,F,C                                                
+Feeling             1    N,O,F,C                                                
+Talking             1    N,O,F,C                                                
+Hearing             1    N,O,F,C                                                
+Tasting/Smelling    1    N,O,F,C                                                
+Near Acuity         1    N,O,F,C                                                
+Far Acuity          1    N,O,F,C                                                
+Depth Percept.      1    N,O,F,C                                                
+Accommodation       1    N,O,F,C                                                
+Color Vision        1    N,O,F,C                                                
+Field of Vision     1    N,O,F,C                                                
+  Environmental Conditions (14 fields) Valid listed for each field below        
+Weather             1    N,O,F,C                                                
+Cold                1    N,O,F,C                                                
+Hot                 1    N,O,F,C                                                
+Wet/Humid           1    N,O,F,C                                                
+Noise               1    1 - 5                                                  
+Vibration           1    N,O,F,C                                                
+Atmospheric Cond.   1    N,O,F,C                                                
+Move, Mech. Parts   1    N,O,F,C                                                
+Electric Shock      1    N,O,F,C                                                
+High, Exp. Places   1    N,O,F,C                                                
+Radiation           1    N,O,F,C                                                
+Explosives          1    N,O,F,C                                                
+Tox. Caus. Chem.    1    N,O,F,C                                                
+Other E. Cond.      1    N,O,F,C                                                
+DOT Title           68   Appears in all Capital Letters                         
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page   7       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                     DOT Definition Database Con't                              
+                                                                                
+Data Contents    Length  Comments and Valid Entries                             
+                                                                                
+  DOT Industry Designations (4 fields)                                          
+Designation 1       16   140 valid entries in file INDNDX, where they           
+                         appear in all small letters                            
+Designation 2       16   May be blank or 140 valid entries in file INDNDX       
+Designation 3       16   May be blank or 140 valid entries in file INDNDX       
+Designation 4       16   May be blank or 140 valid entries in file INDNDX       
+                                                                                
+Definition text     1600 Text of definition, may contain words or phrases       
+                         preceded by delimiter of $T3 and followed by           
+                         delimiter of $T1. Such phrases appear in italics       
+                         in printed version of DOT and are defined in           
+                         GLOSSARY file. Note: 356 records overflow to the       
+                         miscellaneous file DEFMISC1.ASC.  Of these records     
+                         two (2) continue to DEFMISC2.ASC.  Use document        
+                         number to match between files.                         
+                                                                                
+                                                                                
+                                                                                
+            Number of                                                           
+File Name    Records   First Document Number   Last Document Number             
+                                                                                
+DEFDOC1.ASC    600               0000031              0001186                   
+DEFDOC2.ASC    600               0001187              0002070                   
+DEFDOC3.ASC    600               0002072              0002998                   
+DEFDOC4.ASC    600               0002999              0003840                   
+DEFDOC5.ASC    600               0003841              0004681                   
+DEFDOC6.ASC    600               0004683              0005342                   
+DEFDOC7.ASC    600               0005343              0006099                   
+DEFDOC8.ASC    600               0006100              0006863                   
+DEFDOC9.ASC    600               0006864              0007662                   
+DEFDOC10.ASC   600               0007663              0008403                   
+DEFDOC11.ASC   600               0008406              0009148                   
+DEFDOC12.ASC   600               0009150              0009832                   
+DEFDOC13.ASC   600               0009833              0010770                   
+DEFDOC14.ASC   600               0010774              0011599                   
+DEFDOC15.ASC   600               0011600              0012490                   
+DEFDOC16.ASC   600               0012491              0013471                   
+DEFDOC17.ASC   600               0013477              0014336                   
+DEFDOC18.ASC   600               0014337              0016182                   
+DEFDOC19.ASC   600               0016183              0016894                   
+DEFDOC20.ASC   600               0016895              0050017                   
+DEFDOC21.ASC   600               0050018              0051280                   
+DEFDOC22.ASC   141               0051281              0051437                   
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page   8       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                      DOT Master Definitions Database                           
+                                                                                
+Filename = MASTERS.ASC                                                          
+Total number of records = 16                                                    
+Record length = 1701                                                            
+                                                                                
+An explanation of DOT Master Definitions may be found in the text file          
+PARTS.ASC.                                                                      
+                                                                                
+Data Contents     Length Comments and Valid Entries                             
+                                                                                
+Document Number     7    Unique record identifier across all files;             
+                         relationship exists among records in separate          
+                         files that have same Document Number.                  
+Field Separator     1    "|"                                                    
+DOT Code            9    Contains alpha characters, usually an abbreviation     
+                         of title                                               
+Field Separator     1    "|"                                                    
+Definition Type     1    Valid = 5 (Master Definition)                          
+Field Separator     1    "|"                                                    
+Date of Update      2    77 - 90                                                
+Field Separator     1    "|"                                                    
+Title               42   Title of Master                                        
+Field Separator     1    "|"                                                    
+  DOT Industry Designations (two fields)                                        
+Designation 1       16   140 valid entries in file INDNDX.ASC, where they       
+                         appear in all small letters.                           
+Field Separator     1    "|"                                                    
+Designation 2       16   May be blank or 140 valid entries.                     
+Field Separator     1    "|"                                                    
+Definition text     1600 Text of definition.  Append Definition text from       
+                         three records in DEFMISC1 file to Definition text      
+                         of three records in this file, according to            
+                         identical Document Number.                             
+Field Separator     1    "|"                                                    
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page   9       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                       DOT Term Definitions Database                            
+                                                                                
+Filename = TERM.ASC                                                             
+Total number of records = 189                                                   
+Record length = 1708                                                            
+                                                                                
+An explanation of DOT Term Definitions may be found in the text file            
+PARTS.ASC.                                                                      
+                                                                                
+Data Contents     Length Comments and Valid Entries                             
+                                                                                
+Document Number     7    Unique record identifier across all files;             
+                         relationship exists among records in separate          
+                         files that have same Document Number.                  
+Field Separator     1    "|"                                                    
+DOT Code            9    Contains alpha characters, usually an abbreviation     
+                         of title                                               
+Field Separator     1    "|"                                                    
+Definition Type     1    Valid = 6 (Term Definition)                            
+Field Separator     1    "|"                                                    
+Date of Update      2    Valid = 77 - 90                                        
+Field Separator     1    "|"                                                    
+Title               32   Title of Term                                          
+  DOT Industry Designations (three fields)                                      
+Designation 1       16   140 valid entries in file INDNDX.ASC, where they       
+                         appear in all small letters.                           
+Field Separator     1    "|"                                                    
+Designation 2       16   May be blank or 140 valid entries.                     
+Field Separator     1    "|"                                                    
+Designation 3       16   May be blank or 140 valid entries.                     
+Field Separator     1    "|"                                                    
+Definition text     1600 Text of definition                                     
+Field Separator     1    "|"                                                    
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page  10       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                        DOT Miscellaneous Databases                             
+                                                                                
+Filename = DEFMISC1.ASC                                                         
+Total number of records = 360                                                   
+Record length = 1949                                                            
+                                                                                
+This is the first of two "miscellaneous" database files.  This file             
+contains the next segment of description text which could not fit into the      
+space allocated within the DOT definition (DEFDOC), master (MASTER), and        
+DOT Industry (DOTIND)files.  Use the document number field as a key for         
+matching records between files.                                                 
+                                                                                
+Data Contents    Length  Comments and Valid Entries                             
+                                                                                
+Document Number     7    Unique record identifier across all files;             
+                         relationship exists among records in separate          
+                         files that have same Document Number.                  
+Field Separator     1    "|"                                                    
+Definition text     1940 Second portion of definition text field of 360         
+                         records. May contain words or phrases preceded by      
+                         delimiter of $T3 and followed by delimiter of $T1.     
+                         Such phrases appear in italics in printed version      
+                         of DOT and are defined in the file GLOSSARY.           
+                                                                                
+                         Match records in this file, according to Document      
+                         Number, and append them to the definition text         
+                         field of 356 records in DEFDOC file(s); 3 records      
+                         in MASTERS file; and 1 record in DOTIND file.          
+Field Separator     1    "|"                                                    
+                                                                                
+                                                                                
+                                                                                
+Filename = DEFMISC2.ASC                                                         
+Total number of records = 2                                                     
+Record length = 2009                                                            
+                                                                                
+This is the second of two "miscellaneous" database files.  This file            
+contains the last segment of description text which could not fit into the      
+space allocated within the DOT definition (DEFDOC) file(s).  Use the            
+document number field as a key for matching records between files.              
+                                                                                
+Data Contents    Length  Comments and Valid Entries                             
+                                                                                
+Document Number     7    Unique record identifier across all files;             
+                         relationship exists among records in separate          
+                         files that have same Document Number.                  
+Field Separator     1    "|"                                                    
+Definition text     2000 Final portion of definition text field of 2            
+                         definitions in DEFDOC file - after first appending     
+                         definition text for 2 records in DEFMISC1 file.        
+Field Separator     1    "|"                                                    
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page  11       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                          DOT Glossary Database                                 
+                                                                                
+Filename = GLOSSARY.ASC                                                         
+Total number of records = 336                                                   
+Record length = 1653                                                            
+                                                                                
+An explanation of DOT Glossary Definitions may be found in the text file        
+PARTS.ASC.  The Glossary contains technical or special uses of words, which     
+are not ordinarily found in a standard desk dictionary.  These words are        
+recognized by the delimiters $T3 and $T1 before and after the word(s).          
+                                                                                
+Data Contents     Length Comments and Valid Entries                             
+                                                                                
+Document Number     7    Unique record identifier across all files;             
+                         relationship exists among records in separate          
+                         files that have same Document Number.                  
+Field Separator     1    "|"                                                    
+Definition Type     1    Valid = 7 (Glossary Definition)                        
+Field Separator     1    "|"                                                    
+Date of Update      2    77 - 90                                                
+Field Separator     1    "|"                                                    
+Title               38   Title of Glossary word(s)                              
+Field Separator     1    "|"                                                    
+Definition text     1600 Text of definition                                     
+Field Separator     1    "|"                                                    
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page  12       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                           DOT Industry Database                                
+                                                                                
+Filename = DOTIND.ASC                                                           
+Total number of records = 141                                                   
+Record length = 1648                                                            
+                                                                                
+DOTIND (DOT Industry) Definitions explained in text file PARTS. In the          
+printed DOT manual, these appear in the section, "Occupational Titles           
+Arranged by Industry Designation" followed by all titles associated with        
+the specific DOT Industry.                                                      
+                                                                                
+Data Contents     Length Comments and Valid Entries                             
+                                                                                
+Document Number     7    Unique record identifier across all files;             
+                         relationship exists among records in separate          
+                         files that have same Document Number.                  
+Field Separator     1    "|"                                                    
+Definition Type     1    Valid = 8 (DOT Industry Definition)                    
+Field Separator     1    "|"                                                    
+Date of Update      2    Valid = 77 - 90                                        
+Field Separator     1    "|"                                                    
+Title               16   Title of DOT Industry. Contains all small letters      
+                         and punctuation                                        
+Field Separator     1    "|"                                                    
+ DOT Industry Designation                                                       
+Designation 1       16   140 valid entries in file INDNDX, where they           
+                         appear in all small letters                            
+Field Separator     1    "|"                                                    
+Definition text     1600 Text of definition.  Append Definition text from       
+                         one record in DEFMISC1 file to Definition text of      
+                         one record, according to identical Document            
+                         Number.                                                
+Field Separator     1    "|"                                                    
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page  13       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                       DOT Alternate Title Database                             
+                                                                                
+Filename = ALTTITLE.ASC                                                         
+Total number of records = 4867                                                  
+Record length = 197                                                             
+                                                                                
+In the printed version Alternate Titles follow, in parenthesis, the DOT         
+Industry. Alternate Titles are further explained in text file PARTS.            
+                                                                                
+Data Contents     Length Comments and Valid Entries                             
+                                                                                
+Document Number     7    Unique record identifier across all files;             
+                         relationship exists among records in separate          
+                         files that have same Document Number.                  
+Field Separator     1    "|"                                                    
+Title               188  Series of one or more alternate titles in all          
+                         small letters. When there are more than one, they      
+                         are separated by a semicolon (;). Individual           
+                         titles may have comma (,) and/or period (.).           
+Field Separator     1    "|"                                                    
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page  14       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                            DOT Titles Database                                 
+                                                                                
+Filename = TITLES1.ASC thru TITLES7.ASC (see Page 16)                           
+Total number of records =  29393                                                
+Record length = 240                                                             
+                                                                                
+There is one record for each title in the printed "Alphabetical Index of        
+Occupational Titles."  The "Occupational Titles Arranged by Industry            
+Designation" can be created by sorting on the four DOT Industry fields.         
+Document Numbers are used more than once in these files.  Therefore, record     
+uniqueness is obtained through a composite field of Title, Designation1,        
+Designation2, Designation3, and Designation4 rather than through Document       
+Number.                                                                         
+                                                                                
+                                                                                
+                                                                                
+Data Contents     Length Comments and Valid Entries                             
+                                                                                
+Document Number     7    Unique record identifier across all files;             
+                         relationship exists among records in separate          
+                         files that have same Document Number.                  
+Field Separator     1    "|"                                                    
+Condensed Title                                                                 
+    and Industry    84   Contains, in all capital letters, Title and            
+                         usually (DOT) Designation 1 without any spaces or      
+                         punctuation. Used to create alpha sort of              
+                         "Alphabetical Index of Occupational Titles".           
+Field Separator     1    "|"                                                    
+Title               68   Base, Master, and Term titles appear in all            
+                         Capital Letters; Alternate titles appear in all        
+                         small letters; Undefined Related titles have first     
+                         letter of each word Capitalized, other letters are     
+                         small.                                                 
+                                                                                
+ DOT Industry Designations (four fields)                                        
+                                                                                
+Field Separator     1    "|"                                                    
+Designation 1       16   140 valid entries in file INDNDX, where they           
+                         appear in all small letters                            
+Field Separator     1    "|"                                                    
+Designation 2       16   May be blank or 140 valid entries in file INDNDX       
+Field Separator     1    "|"                                                    
+Designation 3       16   May be blank or 140 valid entries in file INDNDX       
+Field Separator     1    "|"                                                    
+Designation 4       16   May be blank or 140 valid entries in file INDNDX       
+Field Separator     1    "|"                                                    
+DOT Code            9                                                           
+Field Separator     1    "|"                                                    
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page  15       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                        DOT Titles Database  con't                              
+                                                                                
+             Number of                                                          
+File Name    Records         First Record                                       
+                                                Last Record                     
+                                                                                
+TITLES1.ASC   4700   ABALONEDIVERFISHING&HUNTING                                
+                                         CLAYPLANTTREATERPETROLREFIN            
+                                                                                
+TITLES2.ASC   4700   CLAYPRODUCTSGLAZERELECEQUIP                                
+                                      FELTCUTTINGMACHINEOPERATORTEXPRODNEC      
+                                                                                
+TITLES3.ASC   4700   FELTDYEINGMACHINETENDERTEXPRODNEC                          
+                                         LATHESANDERWOODWORKING                 
+                                                                                
+TITLES4.ASC   4700   LATHESETUPOPERATORLARGEMACHINESHIP                         
+                                         POLISHERFABRICATIONNEC                 
+                                                                                
+TITLES5.ASC   4700   POLISHERGLASSMFG                                           
+                                         SORTERMACHINESHOP                      
+                                                                                
+TITLES6.ASC   4700   SORTERMINE&QUARRY                                          
+                                         VENTILATIONWORKERMINE&QUARRY           
+                                                                                
+TITLES7.ASC   1193   VENTILATORFABRICATIONNEC                                   
+                                         ZOOVETERINARIANMEDICALSER              
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page  16       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                           DOT Category Database                                
+                                                                                
+Filename = CATEGORY.ASC                                                         
+Total number of records = 9                                                     
+Record length = 1681                                                            
+                                                                                
+This file contains the one-digit DOT category and its associated                
+description.                                                                    
+                                                                                
+Data Contents     Length Comments and Valid Entries                             
+                                                                                
+Document Number     7    Unique record identifier across all files;             
+                         relationship exists among records in separate          
+                         files that have same Document Number.                  
+Field separator     1    "|"                                                    
+DOT Code            9    Valid = 0/1,2,3,4,5,6,7,8,9                            
+Field separator     1    "|"                                                    
+Definition Type     1    Valid = 1 (Category Definition)                        
+Field separator     1    "|"                                                    
+Date of Update      2    77 - 90                                                
+Field separator     1    "|"                                                    
+Title               56   Title of Category                                      
+Field separator     1    "|"                                                    
+Definition text     1600 Text of definition.                                    
+Field separator     1    "|"                                                    
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page  17       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                           DOT Division Database                                
+                                                                                
+Filename = DIVISION.ASC                                                         
+Total number of records = 83                                                    
+Record length = 1743                                                            
+                                                                                
+This file contains the two-digit DOT division and its associated                
+description.                                                                    
+                                                                                
+Data Contents     Length Comments and Valid Entries                             
+                                                                                
+Document Number     7    Unique record identifier across all files;             
+                         relationship exists among records in separate          
+                         files that have same Document Number.                  
+Field separator     1    "|"                                                    
+DOT Code            9    All but two records use only 2 positions.              
+                         Exception valid entries = 00/01, 62/63                 
+Field separator     1    "|"                                                    
+Definition Type     1    Valid = 2 (Division Definition)                        
+Field separator     1    "|"                                                    
+Date of Update      2    Valid = 77 - 90                                        
+Field separator     1    "|"                                                    
+Title               118  Title of Division                                      
+Field separator     1    "|"                                                    
+Definition text     1600 Text of definition.                                    
+Field separator     1    "|"                                                    
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page  18       
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                           Dictionary of Occupational Titles File Documentation 
+------------------------------------------------------------------------------- 
+                                                                                
+                                                                                
+                            DOT Group Database                                  
+                                                                                
+Filename = GROUP.ASC                                                            
+Total number of records = 564                                                   
+Record length = 1774                                                            
+                                                                                
+This file contains the three-digit DOT group and its associated                 
+description.                                                                    
+                                                                                
+Data Contents     Length Comments and Valid Entries                             
+                                                                                
+Document Number     7    Unique record identifier across all files;             
+                         relationship exists among records in separate          
+                         files that have same Document Number.                  
+Field separator     1    "|"                                                    
+DOT Code            9    All records use only 3 positions.                      
+Field separator     1    "|"                                                    
+Definition Type     1    Valid = 3 (Group Definition)                           
+Field separator     1    "|"                                                    
+Date of Update      2    Valid = 77 - 90                                        
+Field separator     1    "|"                                                    
+Title               149  Title of Group                                         
+Field separator     1    "|"                                                    
+Definition text     1600 Text of definition.                                    
+Field separator     1    "|"                                                    
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------------- 
+                                                                 Page  19       

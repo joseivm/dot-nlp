@@ -163,6 +163,7 @@ def get_DPT(code):
 
 def main():
     df_1977 = make_1977_data()
+    df_1977.to_csv(os.path.join(DATA_DIR,'DPT','1977','full_data.csv'),index=False)
     du.save_data(df_1977,'DPT','1977')
 
 main()
