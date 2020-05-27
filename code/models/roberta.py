@@ -62,7 +62,7 @@ def load_examples(args, processor, tokenizer, year,type='train'):
     label_list = processor.get_labels()
 
     examples = processor.get_examples(data_dir,type)
-    features = processor.convert_examples_to_features(examples,tokenizer,max_length=args.max_seq_length)
+    features = processor.convert_examples_to_features(examples,tokenizer,output_mode,max_length=args.max_seq_length)
 
     # Convert to Tensors and build dataset
     all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
