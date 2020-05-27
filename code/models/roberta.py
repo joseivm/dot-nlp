@@ -22,13 +22,20 @@ from tqdm import tqdm, trange
 from transformers import (WEIGHTS_NAME,AdamW,RobertaConfig,
   RobertaForSequenceClassification, RobertaTokenizer,get_linear_schedule_with_warmup)
 
-from dotenv import load_dotenv, find_dotenv
-dotenv_path = find_dotenv()
-load_dotenv(dotenv_path)
+try:
+    from dotenv import load_dotenv, find_dotenv
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+except:
+    print("dotenv not found")
 
 PROJECT_DIR = os.environ.get("PROJECT_DIR")
 
+if not PROJECT_DIR:
+    PROJECT_DIR = ''
+
 sys.path.append(os.path.join(PROJECT_DIR,"code/features"))
+
 import roberta_feature_builder as rfb
 import eval_utils as eu
 import utils
