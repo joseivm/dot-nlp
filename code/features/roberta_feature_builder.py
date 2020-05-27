@@ -128,12 +128,7 @@ class DPTProcessor(DataProcessor):
         label_idx = code_to_idx[code]
         for (i, line) in enumerate(lines):
             guid = "%s-%s" % (set_type, i)
-            try:
-                text_a = line[0] if '1939' in data_dir else line[2]
-                if len(text_a.split()) < 10:
-                    continue
-            except:
-                continue
+            text_a = line[2]
             label = line[3][1:]
             label = label[label_idx] if code else label
             if '1939' in data_dir:
