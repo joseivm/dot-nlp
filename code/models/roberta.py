@@ -45,7 +45,7 @@ MODEL_CLASSES = {
 }
 
 PROCESSORS = {'DPT' : rfb.DPTProcessor, 'Attr' : rfb.AttributesProcessor}
-TASK_YEARS = {'DPT': ['1965','1977'],'Attr':['1965','1991']}
+TASK_YEARS = {'DPT': ['1939','1965','1977'],'Attr':['1965','1991']}
 
 
 
@@ -62,7 +62,7 @@ def load_examples(args, processor, tokenizer, year,type='train'):
     label_list = processor.get_labels()
 
     examples = processor.get_examples(data_dir,type)
-    features = processor.convert_examples_to_features(examples,tokenizer,output_mode,max_length=args.max_seq_length)
+    features, examples = processor.convert_examples_to_features(examples,tokenizer,output_mode,max_length=args.max_seq_length)
 
     # Convert to Tensors and build dataset
     all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
@@ -280,6 +280,8 @@ def evaluate(args, model, tokenizer, eval_year, eval_type):
 
     eval_loss = eval_loss / nb_eval_steps
     preds = np.argmax(preds, axis=1)
+    print(preds.shape)
+    exit()
 
     df = pd.read_csv(data_dir+'/'+eval_type+ '.csv')
     preds_name = 'pred_'+args.task_name
