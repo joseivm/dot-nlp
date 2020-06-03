@@ -22,13 +22,20 @@ from tqdm import tqdm, trange
 from transformers import (WEIGHTS_NAME,AdamW,RobertaConfig,
   RobertaForSequenceClassification, RobertaTokenizer,get_linear_schedule_with_warmup)
 
-from dotenv import load_dotenv, find_dotenv
-dotenv_path = find_dotenv()
-load_dotenv(dotenv_path)
+try:
+    from dotenv import load_dotenv, find_dotenv
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+except:
+    print("dotenv not found")
 
 PROJECT_DIR = os.environ.get("PROJECT_DIR")
 
+if not PROJECT_DIR:
+    PROJECT_DIR = ''
+
 sys.path.append(os.path.join(PROJECT_DIR,"code/features"))
+
 import roberta_feature_builder as rfb
 import eval_utils as eu
 import utils
@@ -38,7 +45,7 @@ MODEL_CLASSES = {
 }
 
 PROCESSORS = {'DPT' : rfb.DPTProcessor, 'Attr' : rfb.AttributesProcessor}
-TASK_YEARS = {'DPT': ['1965','1977'],'Attr':['1965','1991']}
+TASK_YEARS = {'DPT': ['1939','1965','1977'],'Attr':['1965','1991']}
 
 
 
@@ -55,7 +62,7 @@ def load_examples(args, processor, tokenizer, year,type='train'):
     label_list = processor.get_labels()
 
     examples = processor.get_examples(data_dir,type)
-    features = processor.convert_examples_to_features(examples,tokenizer,max_length=args.max_seq_length)
+    features, examples = processor.convert_examples_to_features(examples,tokenizer,output_mode,max_length=args.max_seq_length)
 
     # Convert to Tensors and build dataset
     all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
@@ -273,7 +280,6 @@ def evaluate(args, model, tokenizer, eval_year, eval_type):
 
     eval_loss = eval_loss / nb_eval_steps
     preds = np.argmax(preds, axis=1)
-
     df = pd.read_csv(data_dir+'/'+eval_type+ '.csv')
     preds_name = 'pred_'+args.task_name
     identifier = args.identifier
@@ -282,14 +288,16 @@ def evaluate(args, model, tokenizer, eval_year, eval_type):
     label_map = {i: label for i, label in enumerate(label_list)}
     df[preds_name] = df[preds_name].apply(lambda x: label_map[x])
     df[preds_name] = df[preds_name].astype(str)
-    df = df[['Title','Code','Definition',preds_name,args.task_name]]
-    labels = df[args.task_name]
+    if not '1939' in data_dir:
+        df = df[['Title','Code','Definition',preds_name,args.task_name]]
+        labels = df[args.task_name]
     df.to_csv(os.path.join(eval_output_dir,identifier+'_'+eval_year+'_'+eval_type+'_preds.csv'),index=False)
-    result = eu.evaluate_predictions(df[preds_name],labels,args.task_name)
-    output_eval_file = os.path.join(eval_results_dir,args.identifier+'_' + eval_year + "_"+eval_type +"_results.csv")
-    result.to_csv(output_eval_file,index=False,float_format='%.3f')
+    if not '1939' in data_dir:
+        result = eu.evaluate_predictions(df[preds_name],labels,args.task_name)
+        output_eval_file = os.path.join(eval_results_dir,args.identifier+'_' + eval_year + "_"+eval_type +"_results.csv")
+        result.to_csv(output_eval_file,index=False,float_format='%.3f')
 
-    print(result)
+        print(result)
 
 def main():
     parser = utils.roberta_parser()

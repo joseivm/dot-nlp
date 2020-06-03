@@ -105,7 +105,7 @@ class DPTProcessor(DataProcessor):
 
     def get_examples(self,data_dir,set_type,code=''):
         lines = self.read_csv(data_dir+'/'+set_type+'.csv')
-        examples = self.create_examples(lines,set_type,code)
+        examples = self.create_examples(lines,set_type,code,data_dir)
         return(examples)
 
     def get_labels(self,code=''):
@@ -122,7 +122,7 @@ class DPTProcessor(DataProcessor):
         lines = df.to_numpy().tolist()
         return(lines)
 
-    def create_examples(self,lines,set_type,code=''):
+    def create_examples(self,lines,set_type,code='',data_dir=None):
         examples = []
         code_to_idx = {'data':0,'people':1,'things':2,'':None}
         label_idx = code_to_idx[code]
@@ -131,6 +131,8 @@ class DPTProcessor(DataProcessor):
             text_a = line[2]
             label = line[3][1:]
             label = label[label_idx] if code else label
+            if '1939' in data_dir:
+                label = '000'
             examples.append(InputExample(guid=guid, text_a=text_a, label=label))
         return examples
 
@@ -162,7 +164,6 @@ class DPTProcessor(DataProcessor):
 
         features = []
         for (ex_index, example) in enumerate(examples):
-
             inputs = tokenizer.encode_plus(
                 example.text_a,
                 example.text_b,
@@ -201,7 +202,7 @@ class DPTProcessor(DataProcessor):
                                   token_type_ids=token_type_ids,
                                   label=label))
 
-        return features
+        return features, examples
 
 class AttributesProcessor(DataProcessor):
     """Processor for the DOT data set"""

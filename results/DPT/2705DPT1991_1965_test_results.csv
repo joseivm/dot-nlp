@@ -1,0 +1,4 @@
+Accuracy,Attribute,Correlation,MSE,Rank Correlation
+0.794,data,0.865,1.255,0.856
+0.821,people,0.832,1.105,0.743
+0.786,things,0.778,2.487,0.761
