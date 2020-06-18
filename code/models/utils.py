@@ -136,4 +136,6 @@ def roberta_parser():
                         type=str,
                         default='cuda:2',
                         help="CUDA device to use")
+    parser.add_argument('--eval_on_all',
+                        action='store_true')
     return parser

@@ -45,7 +45,8 @@ MODEL_CLASSES = {
 }
 
 PROCESSORS = {'DPT' : rfb.DPTProcessor, 'Attr' : rfb.AttributesProcessor}
-TASK_YEARS = {'DPT': ['1939','1965','1977'],'Attr':['1965','1991']}
+TASK_YEARS = {'DPT': ['1939', '1965', '1991', '1977'],'Attr':['1965','1991']}
+# TASK_YEARS = {'DPT': ['1939','1965','1977'],'Attr':['1965','1991']}
 
 
 
@@ -233,7 +234,9 @@ def evaluate_model(args):
     model = RobertaForSequenceClassification.from_pretrained(model_dir)
     model.to(args.device)
     for year in TASK_YEARS[args.task_name]:
-        evaluate(args, model, tokenizer,year,'test')
+        if args.eval_on_all:
+            print('eval on all!')
+        evaluate(args, model, tokenizer,year,'test' if not args.eval_on_all else 'full_data')
 
 def evaluate(args, model, tokenizer, eval_year, eval_type):
     eval_results_dir = os.path.join(PROJECT_DIR,"results",args.task_name)
