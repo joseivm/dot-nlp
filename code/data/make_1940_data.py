@@ -212,7 +212,7 @@ class AttributesParser39:
 
 ##### Data Loading Functions #####
 def load_39_dot():
-    filepath = os.path.join(DATA_DIR,'raw','1939_Output.txt')
+    filepath = os.path.join(DATA_DIR,'source','1939_Output.txt')
     with open(filepath,'r',errors='ignore') as f:
         lines = f.readlines()
     dot = [line.strip() for line in lines]
@@ -251,23 +251,28 @@ def match_reference_defs(df):
     df['NumberedTitle'] = df['Title']+ ' '+df['Numeral']
     df = clean_column(df,'NumberedTitle')
     df['Code'] = df.Code.replace({'': np.nan})
+    df['ReferenceDefinition'] = ''
     for idx, row in df.iterrows():
         if str(row['Code']) == 'nan':
             if idx % 1000 == 0: print(idx)
-            df.at[idx,'Code'] = find_code(df,row['NumberedTitle'])
+            code, definition = find_code_and_def(df,row['NumberedTitle'])
+            df.at[idx,'Code'] = code
+            df.at[idx,'ReferenceDefinition'] = definition
     df.drop(columns=['HasReference'],inplace=True)
     return df
 
-def find_code(df,title):
+def find_code_and_def(df,title):
     if sum(df.NumberedTitle == title) == 0:
-        return np.nan
+        return np.nan, ''
     elif df.loc[df.NumberedTitle == title,'Code'].notna().to_numpy()[0]:
-        return df.loc[df.NumberedTitle == title,'Code'].to_numpy()[0]
+        code = df.loc[df.NumberedTitle == title,'Code'].to_numpy()[0]
+        definition = df.loc[df.NumberedTitle == title,'Definition'].to_numpy()[0]
+        return code, definition
     elif df.loc[df.NumberedTitle == title,'ReferenceTitle'].notna().to_numpy()[0]:
         reference_title = df.loc[df.NumberedTitle == title,'ReferenceTitle'].to_numpy()[0]
-        return find_code(df,reference_title)
+        return find_code_and_def(df,reference_title)
     else:
-        return np.nan
+        return np.nan, ''
 
 ##### Inspection Function #####
 def next_n(df,n,num):
@@ -277,6 +282,6 @@ def next_n(df,n,num):
 
 def main():
     dot_1939 = make_1939_data()
-    dot_1939.to_csv(os.path.join(DATA_DIR,'clean','1939_DOT.csv'),index=False)
+    dot_1939.to_csv(os.path.join(DATA_DIR,'source','1939_DOT_structured.csv'),index=False)
 
 main()

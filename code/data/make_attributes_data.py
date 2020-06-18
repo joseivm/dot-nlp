@@ -202,6 +202,7 @@ class AttributesParser91:
             entry['DCP'] = 1 if 'D' in temp else 0
             entry['STS'] = 1 if 'T' in temp else 0
             entry['DLU'] = update_date
+            entry['SVP'] = svp
             self.definitions.append(entry)
 
         df = pd.DataFrame(self.definitions)
@@ -209,8 +210,8 @@ class AttributesParser91:
         df['DPT'] = df['Code'].str.slice(3,6).apply(harmonize_DPT)
         df['Attr'] = list(zip(df.GED.astype(str),df.EHFCoord.astype(str),
                               df.FingerDexterity.astype(str),df.DCP.astype(str),
-                              df.STS.astype(str)))
-        df = df[['Title','Code','Definition','DPT','Industry','GED','EHFCoord','FingerDexterity','DCP','STS','Attr']]
+                              df.STS.astype(str),df.SVP.astype(str)))
+        df = df[['Title','Code','Definition','DPT','Industry','GED','EHFCoord','FingerDexterity','DCP','STS','SVP','Attr']]
         return(df)
 
 ##### Data Loading Functions #####
@@ -269,8 +270,8 @@ def make_1965_data():
     md['DPT'] = md['DPT'].apply(harmonize_DPT)
     md['Attr'] = list(zip(md.GED.astype(str),md.EHFCoord.astype(str),
                           md.FingerDexterity.astype(str),md.DCP.astype(str),
-                          md.STS.astype(str)))
-    md = md[['Title','Code','Definition','DPT','Industry','GED','EHFCoord','FingerDexterity','DCP','STS','Attr']]
+                          md.STS.astype(str),md.SVP.astype(str)))
+    md = md[['Title','Code','Definition','DPT','Industry','GED','EHFCoord','FingerDexterity','DCP','STS','SVP','Attr']]
     return(md)
 
 def make_1991_data():
@@ -326,6 +327,7 @@ def add_outcomes(md):
     md['FingerDexterity'] = md['F'].apply(str).apply(compute_midpoint)
     md['DCP'] = md['Temp'].astype(str).str.contains('4')
     md['STS'] = md['Temp'].astype(str).str.contains('Y',case=False)
+    md['SVP'] = md['SVP'].apply(str).apply(compute_midpoint)
     md = md.replace({True: 1, False: 0})
     return(md)
 
