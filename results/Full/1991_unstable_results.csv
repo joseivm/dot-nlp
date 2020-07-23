@@ -1,0 +1,5 @@
+Attribute,Accuracy,Correlation,Rank Correlation,MAE,Obs
+GED,0.178,0.762,0.786,0.851,12741
+SVP,0.249,0.840,0.837,0.933,12741
+EHFCoord,0.294,0.230,0.152,0.505,12741
+FingerDext,0.121,0.373,0.347,0.533,12741
